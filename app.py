@@ -4,7 +4,6 @@ import numpy as np
 import scipy.stats
 import openai
 import os
-from dotenv import load_dotenv
 from openai import OpenAI
 
 
