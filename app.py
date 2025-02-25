@@ -15,10 +15,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get the API key and model ID from the environment
-openai.api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=os.st.secrets["OPENAI_API_KEY"])
 
-MODEL_ID = os.getenv("MODEL_ID")
+MODEL_ID = st.secrets["MODEL_ID"]
 
 # Define focus-to-dimensions mapping
 focus_to_dimensions = {
@@ -137,7 +137,7 @@ if uploaded_file is not None:
             )
 
             # Accessing the generated content from the response
-            generated_content = response['choices'][0].message.content.strip()
+            generated_content = response.choices[0].message.content.strip()
 
             # Append the generated content along with the focus to the descriptions list
             descriptions.append({"focus": focus, "description": generated_content})
