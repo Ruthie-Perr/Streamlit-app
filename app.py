@@ -9,10 +9,7 @@ from openai import OpenAI
 
 
 import os
-from dotenv import load_dotenv
 
-# Load environment variables from a .env file
-load_dotenv()
 
 # Get the API key and model ID from the environment
 openai.api_key = st.secrets["OPENAI_API_KEY"]
