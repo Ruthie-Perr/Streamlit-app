@@ -12,7 +12,7 @@ import os
 
 # Get the API key and model ID from the environment
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-client = OpenAI(api_key=os.st.secrets["OPENAI_API_KEY"])
+client = OpenAI(api_key= st.secrets["OPENAI_API_KEY"])
 
 MODEL_ID = st.secrets["MODEL_ID"]
 
