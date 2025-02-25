@@ -5,12 +5,19 @@ import scipy.stats
 import openai
 import os
 from dotenv import load_dotenv
+from openai import OpenAI
 
-# Load environment variables from .env file
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from a .env file
 load_dotenv()
 
-# Set up OpenAI API key and model ID
+# Get the API key and model ID from the environment
 openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 MODEL_ID = os.getenv("MODEL_ID")
 
 # Define focus-to-dimensions mapping
@@ -32,8 +39,9 @@ uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 # Project name input
 project_name = st.text_input("Project Name")
 
-# Team members input
-team_members = st.text_area("Team Members (comma-separated)")
+
+# Team members input (using text_area for free-form input)
+team_members_input = st.text_area("Enter Team Members (comma-separated)", "")
 
 # If file is uploaded, process the data
 if uploaded_file is not None:
@@ -41,15 +49,25 @@ if uploaded_file is not None:
         # Read the uploaded CSV into a pandas DataFrame
         data = pd.read_csv(uploaded_file)
 
-        # Process team members input
-        team_member_list = [member.strip() for member in team_members.split(",")] if team_members else []
+        # Process team members input (converting to list after splitting by commas)
+        team_member_list = [member.strip() for member in team_members_input.split(",")] if team_members_input else []
+
 
         # Filter based on project name or team members
         if project_name:
-            data = data[data["Project"] == project_name]
-        if team_member_list:
-            data = data[data["Participant"].isin(team_member_list)]
+            data = data[data["Project"].str.lower() == project_name.lower()]
 
+        # If no project name is provided but team members are given, filter by team members
+        if not project_name and team_member_list:
+            # Convert the "Participant" column to lowercase for case-insensitive matching
+            data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
+
+       # If neither project name nor team members are provided, show a warning
+        if not project_name and not team_member_list:
+            st.warning("Please provide either a project name or team members to filter the data.")
+
+
+        
         # Filter 'self-image' entries
         data = data[data["Type"] == "self-image"]
 
@@ -108,19 +126,23 @@ if uploaded_file is not None:
                 f"Provide an analysis that describes how the team's scores in these areas influence the project."
             )
 
-            # Request from OpenAI API
-            response = openai.ChatCompletion.create(
-                model=MODEL_ID,
-                messages=[{"role": "system", "content": "You are a helpful assistant."},
-                          {"role": "user", "content": prompt}],
-                temperature=0.4
+            # Request from OpenAI API using client
+            response = client.chat.completions.create(
+                model=MODEL_ID,  # Replace with your fine-tuned model ID
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.4  # from 0 (very deterministic) to 2 (maximum randomness)
             )
 
-            # Extract generated content
-            generated_content = response['choices'][0]['message']['content'].strip()
+            # Accessing the generated content from the response
+            generated_content = response['choices'][0].message.content.strip()
 
-            # Append generated content to descriptions
+            # Append the generated content along with the focus to the descriptions list
             descriptions.append({"focus": focus, "description": generated_content})
+
+
 
         # Prepare team member scores
         for _, row in data.iterrows():
@@ -146,3 +168,6 @@ if uploaded_file is not None:
 
 else:
     st.warning("Please upload a CSV file.")
+
+
+
