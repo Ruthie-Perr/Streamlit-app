@@ -4,19 +4,10 @@ import numpy as np
 import scipy.stats
 import openai
 import os
-from openai import OpenAI
 
-
-import os
-
-
-# Get the API key and model ID from the environment
+# Initialize OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-# client = OpenAI(api_key=openai.api_key)
-
-client = openai.Client(api_key = openai.api_key)
-
-
+client = openai.Client(api_key=openai.api_key)
 
 MODEL_ID = st.secrets["MODEL_ID"]
 
@@ -31,14 +22,13 @@ focus_to_dimensions = {
 }
 
 # Streamlit UI
-st.title("Project and Team Member Scoring")
+st.title("AI Team Analyses")
 
 # Upload CSV file
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 # Project name input
 project_name = st.text_input("Project Name")
-
 
 # Team members input (using text_area for free-form input)
 team_members_input = st.text_area("Enter Team Members (comma-separated)", "")
@@ -52,22 +42,16 @@ if uploaded_file is not None:
         # Process team members input (converting to list after splitting by commas)
         team_member_list = [member.strip() for member in team_members_input.split(",")] if team_members_input else []
 
-
         # Filter based on project name or team members
         if project_name:
             data = data[data["Project"].str.lower() == project_name.lower()]
 
-        # If no project name is provided but team members are given, filter by team members
         if not project_name and team_member_list:
-            # Convert the "Participant" column to lowercase for case-insensitive matching
             data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
 
-       # If neither project name nor team members are provided, show a warning
         if not project_name and not team_member_list:
             st.warning("Please provide either a project name or team members to filter the data.")
 
-
-        
         # Filter 'self-image' entries
         data = data[data["Type"] == "self-image"]
 
@@ -119,21 +103,60 @@ if uploaded_file is not None:
                 for dim in dimensions
             ]
 
-            prompt = (
-                f"Generate a description for the team '{project_name}' with focus on the following dimension(s): {dimensions_text}.\n\n"
-                f"Here are the aggregate measures of the team scores:\n"
+            # Construct a specific prompt for each focus area
+            if focus == "Product-Market-Fit":
+                prompt = (
+                    f"Generate a detailed description for the team '{project_name}' with focus on the Attachment dimension.\n\n"
+                    f"Here are the aggregate measures of the team scores per dimension:\n"
+                    f"{'\n'.join(aggregate_texts)}\n\n"
+                    f"Provide an analysis that describes how the Attachment score influences the team's alignment between product and customer needs."
+                )
+            elif focus == "Speed-to-Market":
+                prompt = (
+                    f"Generate a detailed description for the team '{project_name}' with focus on the Exploration dimension.\n\n"
+                    f"Here are the aggregate measures of the team scores per dimension:\n"
+                    f"{'\n'.join(aggregate_texts)}\n\n"
+                    f"Provide an analysis that describes how the Exploration score impacts the team's speed to market."
+                )
+            elif focus == "Strategic Agility Index":
+                prompt = (
+                    f"Generate a detailed description for the team '{project_name}' with focus on the Managing Complexity dimension.\n\n"
+                    f"Here are the aggregate measures of the team scores per dimension:\n"
+                    f"{'\n'.join(aggregate_texts)}\n\n"
+                    f"Provide an analysis that describes how the Managing Complexity score influences the team's ability to manage both complex and complicated problems."
+                )
+                
+    	    elif focus == "Strategic Hire Analysis":
+                prompt = (
+                    f"Generate a detailed description for the team '{project_name}' with focus on the five result areas created by the Attachment and Exploration dimensions.\n\n"
+                f"Here are the aggregate measures of the team scores per dimension:\n"
                 f"{'\n'.join(aggregate_texts)}\n\n"
-                f"Provide an analysis that describes how the team's scores in these areas influence the project."
-            )
+                f"Provide an analysis that uses the provided Attachment and Exploration scores to categorize individuals into one of the five result areas from the Strategic Hire Analysis: 1. Relationship-Optimization Quadrant (High Attachment score combined with Low Exploration Score), 2.Content-Optimization Quadrant (Low Attachment score with Low Exploration Score) , 3. Relationship-Exploration Quadrant (High Attachment score combined with High Exploration Score), 4. Content-Exploration Quadrant (Low Attachment Score combined with High Exploration score), 5. Strategic Execution Zone (Medium Attachment score combined with medium Exploration score). Based on the categorization, describe the team’s strengths and potential gaps in performance. Be sure to reflect on how the combination of the Attachment and Exploration dimensions shapes each individual’s contribution to the team."
+        )
+    
+            elif focus == "Business Performance":
+                prompt = (
+                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Business Performance Dialogue, based on the Attachment and Exploration scores. The analysis should consider the team’s contributions in the following phases: 1. Changing with People (High Attachment & High Exploration), 2. Operational Core (Mid Attachment & Mid Exploration), 3. Structured Delivery (Low Attachment & Low Exploration)\n\n"
+                    f"Here are the aggregate measures of the team scores per dimension:\n"
+                    f"{'\n'.join(aggregate_texts)}\n\n"
+                    f"Provide an analysis that identifies where team members fall within each of the three phases, based on their Attachment and Exploration scores. Highlights how these contributions shape the team's performance and collaboration in each phase (e.g., driving change, converting ideas into projects, ensuring execution). Points out any gaps or underrepresented contributions in specific phases, particularly where contributions from either Attachment or Exploration might be lacking."
+        )
 
-            # Request from OpenAI API using client
+            elif focus == "Safeguarding Innovation":
+                prompt = (
+                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Safeguarding Innovation Dialogue, based on the following scores:.\n\n"
+                    f"Here are the aggregate measures of the team scores per dimension:\n"
+                    f"{'\n'.join(aggregate_texts)}\n\n"
+                    f"Provide an analysis that: Identifies how the team distributes across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions, particularly in terms of the balance between Exploration and Attachment. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation."
+        )
+
+
+            # Request from OpenAI API
             response = client.chat.completions.create(
                 model=MODEL_ID,  # Replace with your fine-tuned model ID
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.4  # from 0 (very deterministic) to 2 (maximum randomness)
+                messages=[{"role": "system", "content": "You are a helpful assistant."},
+                          {"role": "user", "content": prompt}],
+                temperature=0.4
             )
 
             # Accessing the generated content from the response
@@ -141,8 +164,6 @@ if uploaded_file is not None:
 
             # Append the generated content along with the focus to the descriptions list
             descriptions.append({"focus": focus, "description": generated_content})
-
-
 
         # Prepare team member scores
         for _, row in data.iterrows():
@@ -168,6 +189,7 @@ if uploaded_file is not None:
 
 else:
     st.warning("Please upload a CSV file.")
+
 
 
 
