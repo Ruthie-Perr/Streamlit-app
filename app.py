@@ -126,7 +126,7 @@ if uploaded_file is not None:
                     f"Provide an analysis that describes how the Managing Complexity score influences the team's ability to manage both complex and complicated problems."
                 )
                 
-    	    elif focus == "Strategic Hire Analysis":
+            elif focus == "Strategic Hire Analysis":
                 prompt = (
                     f"Generate a detailed description for the team '{project_name}' with focus on the five result areas created by the Attachment and Exploration dimensions.\n\n"
                 f"Here are the aggregate measures of the team scores per dimension:\n"
@@ -147,7 +147,7 @@ if uploaded_file is not None:
                     f"Generate a detailed analysis of the team '{project_name}' with focus on the Safeguarding Innovation Dialogue, based on the following scores:.\n\n"
                     f"Here are the aggregate measures of the team scores per dimension:\n"
                     f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that: Identifies how the team distributes across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions, particularly in terms of the balance between Exploration and Attachment. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation."
+                    cf"Provide an analysis that: Identifies how the team distributes across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions, particularly in terms of the balance between Exploration and Attachment. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation."
         )
 
 
