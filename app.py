@@ -144,7 +144,7 @@ if uploaded_file is not None:
 
             elif focus == "Safeguarding Innovation":
                 prompt = (
-                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Safeguarding Innovation Dialogue, based on the following scores:.\n\n"
+                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Safeguarding Innovation Dialogue, based on the Attachment and Exploration scores.\n\n"
                     f"Here are the aggregate measures of the team scores per dimension:\n"
                     f"{'\n'.join(aggregate_texts)}\n\n"
                     cf"Provide an analysis that: Identifies how the team distributes across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions, particularly in terms of the balance between Exploration and Attachment. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation."
