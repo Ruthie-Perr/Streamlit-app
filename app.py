@@ -128,7 +128,7 @@ if uploaded_file is not None:
                 
             elif focus == "Strategic Hire Analysis":
                 prompt = (
-                    f"Generate a detailed description for the team '{project_name}' with focus on the five result areas created by the Attachment and Exploration dimensions.\n\n"
+                    f"Generate a detailed description for the team '{project_name}' with focus on the Strategic Hire Analysis.\n\n"
                 f"Here are the aggregate measures of the team scores per dimension:\n"
                 f"{'\n'.join(aggregate_texts)}\n\n"
                 f"Provide an analysis that uses the provided Attachment and Exploration scores to categorize individuals into one of the five result areas from the Strategic Hire Analysis: 1. Relationship-Optimization Quadrant (High Attachment score combined with Low Exploration Score), 2.Content-Optimization Quadrant (Low Attachment score with Low Exploration Score) , 3. Relationship-Exploration Quadrant (High Attachment score combined with High Exploration Score), 4. Content-Exploration Quadrant (Low Attachment Score combined with High Exploration score), 5. Strategic Execution Zone (Medium Attachment score combined with medium Exploration score). Based on the categorization, describe the team’s strengths and potential gaps in performance. Be sure to reflect on how the combination of the Attachment and Exploration dimensions shapes each individual’s contribution to the team."
@@ -136,18 +136,18 @@ if uploaded_file is not None:
     
             elif focus == "Business Performance":
                 prompt = (
-                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Business Performance Dialogue, based on the Attachment and Exploration scores. The analysis should consider the team’s contributions in the following phases: 1. Changing with People (High Attachment & High Exploration), 2. Operational Core (Mid Attachment & Mid Exploration), 3. Structured Delivery (Low Attachment & Low Exploration)\n\n"
-                    f"Here are the aggregate measures of the team scores per dimension:\n"
+                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Business Performance Dialogue. The analysis should consider the team’s contributions in the following phases: 1. Changing with People (High Attachment & High Exploration), 2. Operational Core (Mid Attachment & Mid Exploration), 3. Structured Delivery (Low Attachment & Low Exploration)\n\n"
+                    f"Here is the distribution of the teammembers across the three phases:\n"
                     f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that identifies where team members fall within each of the three phases, based on their Attachment and Exploration scores. Highlights how these contributions shape the team's performance and collaboration in each phase (e.g., driving change, converting ideas into projects, ensuring execution). Points out any gaps or underrepresented contributions in specific phases, particularly where contributions from either Attachment or Exploration might be lacking."
+                    f"Provide an analysis that analyzes the distribution of teammembers across the three phases. Highlights how these contributions shape the team's performance and collaboration in each phase (e.g., driving change, converting ideas into projects, ensuring execution). Points out any gaps or underrepresented contributions in specific phases. Ideally, a well-balanced team has an even distribution of members across all three phases, ensuring the team is equipped to be effective in all areas. Suggests strategies to address these gaps, ensuring smoother transitions across phases."
         )
 
             elif focus == "Safeguarding Innovation":
                 prompt = (
-                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Safeguarding Innovation Dialogue, based on the Attachment and Exploration scores.\n\n"
-                    f"Here are the aggregate measures of the team scores per dimension:\n"
+                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Safeguarding Innovation Dialogue.\n\n"
+                    f"Here is the distribution of the teammembers across the three phases:\n"
                     f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that: Identifies how the team distributes across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions, particularly in terms of the balance between Exploration and Attachment. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation."
+                    f"Provide an analysis that: Identifies how the teammembers are distributed across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation. Proposes strategies to address these gaps, including possible adjustments to team roles or introducing new perspectives to ensure successful embedding of innovations.  Ideally, a well-balanced team has an even distribution of members across all three phases, ensuring the team is equipped to be effective in all areas."
         )
 
 
