@@ -4,6 +4,7 @@ import numpy as np
 import scipy.stats
 import openai
 import os
+import json
 
 # Initialize OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -18,8 +19,20 @@ focus_to_dimensions = {
     "Strategic Agility Index": ["managing complexity score"],
     "Strategic Hire Analysis": ["attachment score", "exploration score"],
     "Business Performance": ["attachment score", "exploration score"],
-    "Safeguarding Innovation": ["exploration score", "attachment score"]
+    "Safeguarding Innovation": ["attachment score", "exploration score"]
 }
+
+
+# Specific prompt guidance for each focus area
+focus_prompts = {
+    "Product-Market-Fit": "Provide an analysis of how the Attachment score (ranging from 0 to 100) influences the team's alignment between product and customer needs. A low Attachment score (0-40) indicates a stronger focus on product and technical content, prioritizing internal development over direct customer engagement, while a high Attachment score (60-100) suggests a team that is highly customer-centric, prioritizing relationships and market needs. A medium Attachment score (40-60) represents a balance between these two approaches. Discuss how the distribution of Attachment scores affects the team’s ability to achieve market fit, customer engagement, and responsiveness to user needs, highlighting potential gaps in understanding customer perspectives. A well-balanced team is not one where everyone has similar scores but rather one with a diverse mix of low, medium, and high scores, ensuring a variety of perspectives and capabilities. First, summarize the distribution of scores. Then, based on this, analyze the team’s alignment and blind spots while ensuring logical consistency.",
+    "Speed-to-Market": "Analyze how the Exploration score influences the team's ability to balance innovation with the practical demands of delivering solutions in a timely manner. This dialogue assesses how well a team balances innovation and efficiency in R&D, product development, and regulatory processes. It explores whether the team leans more toward Exploration (high Exploration scores >60)—indicating a strong focus on innovation, experimentation, and discovering new possibilities—or toward Optimization (low Exploration scores <40)—indicating a focus on refining, streamlining, and efficiently executing established processes. A well-balanced team is not one where all members cluster in the middle (Exploration score between 40 and 60) but rather one where there is a comparable number of members across the low, medium, and high score ranges. This distribution ensures diversity in perspectives and capabilities, allowing for both ambitious innovation and pragmatic execution. First, summarize the distribution of scores. Then, based on this, analyze the team’s alignment and blind spots while ensuring logical consistency.",
+    "Strategic Agility Index": "Provide an analysis that describes how the Managing Complexity score influences the team's ability to manage both complex and complicated problems. Consider how the score affects the team's adaptability, decision-making, and overall strategic execution. A well-balanced team has an even distribution of members across the score quadrants, rather than clustering in one or two areas. This means that team members should be spread across low, medium, and high ranges of scores rather than all scoring similarly. Each quadrant should have a comparable number of members to ensure diversity in perspectives and capabilities. First, summarize the distribution of scores. Then, based on this, analyze the team’s alignment and blind spots while ensuring logical consistency.",
+    "Strategic Hire Analysis": "Provide an analysis that reflects on the distribution of the individuals into the result areas from the Strategic Hire Analysis: 1. Relationship-Optimization Quadrant (Attachment score >50 combined with Exploration Score <50), 2.Content-Optimization Quadrant (Attachment score <50 with Exploration Score <50) , 3. Relationship-Exploration Quadrant (Attachment score >50 combined with Exploration Score> 50), 4. Content-Exploration Quadrant (Attachment Score<50 combined with Exploration score>50), 5. Operational Core (Medium Attachment score combined with medium Exploration score). Based on the categorization, describe the team’s strengths and  potential gaps in performance. Be sure to reflect on how the combination of the Attachment and Exploration dimensions shapes each individual’s contribution to the team. Ideally, the team has a nice spread across the different result-areas. When there is an imbalance in these quadrants (e.g., over or under-representation in one area), suggest potential consequences or blind spots, and provide recommendations for balancing the team.",
+    "Business Performance": "Provide an analysis that analyzes the distribution of teammembers across the three phases. Highlights how these contributions shape the team's performance and collaboration in each phase (e.g., driving change, converting ideas into projects, ensuring execution). Points out any gaps or underrepresented contributions in specific phases. Ideally, a well-balanced team has an even distribution of members across all three phases, ensuring the team is equipped to be effective in all areas. Suggests strategies to address these gaps, ensuring smoother transitions across phases.",
+    "Safeguarding Innovation": "Provide an analysis that: Identifies how the teammembers are distributed across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation. Proposes strategies to address these gaps, including possible adjustments to team roles or introducing new perspectives to ensure successful embedding of innovations.  Ideally, a well-balanced team has an even distribution of members across all three phases, ensuring the team is equipped to be effective in all areas."
+}
+
 
 # Streamlit UI
 st.title("AI Team Analyses")
@@ -85,9 +98,21 @@ if uploaded_file is not None:
                 "ratio_above_75": round((scores >= 75).mean(), 2)
             }
 
+        # Compute combined ratios
+        total_members = len(data)
+        ratio_high_high = np.round(((data["attachment score"] > 65) & (data["exploration score"] > 65)).mean(), 2)
+        ratio_mid_mid = np.round(((data["attachment score"].between(35, 65)) & (data["exploration score"].between(35, 65))).mean(), 2)
+        ratio_low_low = np.round(((data["attachment score"] < 35) & (data["exploration score"] < 35)).mean(), 2)
+        ratio_low_high = np.round(((data["attachment score"] < 35) & (data["exploration score"] > 65)).mean(), 2)
+        ratio_mid_mid_2 = np.round(((data["attachment score"].between(35, 65)) & (data["exploration score"].between(35, 65))).mean(), 2)
+        ratio_high_low = np.round(((data["attachment score"] > 65) & (data["exploration score"] < 35)).mean(), 2)
+        ratio_quadrant_1 = np.round(((data["attachment score"] < 51) & (data["exploration score"] < 51)).mean(), 2)
+        ratio_quadrant_2 = np.round(((data["attachment score"] > 50) & (data["exploration score"] < 51)).mean(), 2)
+        ratio_quadrant_3 = np.round(((data["attachment score"] > 50) & (data["exploration score"] > 50)).mean(), 2)
+        ratio_quadrant_4 = np.round(((data["attachment score"] < 51) & (data["exploration score"] > 50)).mean(), 2)
+
         # Prepare to generate descriptions
         descriptions = []
-        team_member_scores = []
 
         # Loop through each focus area and generate a prompt for the API
         for focus, dimensions in focus_to_dimensions.items():
@@ -103,53 +128,39 @@ if uploaded_file is not None:
                 for dim in dimensions
             ]
 
+            # Add combined ratios based on focus
+            if focus == "Strategic Hire Analysis":
+                combined_texts = [
+                    f"- Ratio of team members in the Content-Optimisation quadrant: {ratio_quadrant_1}",
+                    f"- Ratio of team members in the Relationship-Optimisation quadrant: {ratio_quadrant_2}",
+                    f"- Ratio of team members in the Relationship-Exploration quadrant: {ratio_quadrant_3}",
+                    f"- Ratio of team members in the Content-Exploration quadrant: {ratio_quadrant_4}"
+                ]
+            elif focus == "Business Performance":
+                combined_texts = [
+                    f"- Ratio of team members in Phase 1: with Attachment & Exploration > 65: {ratio_high_high}",
+                    f"- Ratio of team members in Phase 2: with Attachment & Exploration between 35-65: {ratio_mid_mid}",
+                    f"- Ratio of team members in Phase 3: with Attachment & Exploration < 35: {ratio_low_low}"
+                ]
+            elif focus == "Safeguarding Innovation":
+                combined_texts = [
+                    f"- Ratio of team members in Phase 1: with Attachment < 35 & Exploration > 65: {ratio_low_high}",
+                    f"- Ratio of team members in Phase 2: with Attachment between 35-65 & Exploration between 35-65: {ratio_mid_mid_2}",
+                    f"- Ratio of team members in Phase 3:with Attachment > 65 & Exploration < 35: {ratio_high_low}"
+                ]
+            else:
+                combined_texts = []
+
+            aggregate_texts.extend(combined_texts)
+
             # Construct a specific prompt for each focus area
-            if focus == "Product-Market-Fit":
-                prompt = (
-                    f"Generate a detailed description for the team '{project_name}' with focus on the Attachment dimension.\n\n"
-                    f"Here are the aggregate measures of the team scores per dimension:\n"
-                    f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that describes how the Attachment score influences the team's alignment between product and customer needs."
-                )
-            elif focus == "Speed-to-Market":
-                prompt = (
-                    f"Generate a detailed description for the team '{project_name}' with focus on the Exploration dimension.\n\n"
-                    f"Here are the aggregate measures of the team scores per dimension:\n"
-                    f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that describes how the Exploration score impacts the team's speed to market."
-                )
-            elif focus == "Strategic Agility Index":
-                prompt = (
-                    f"Generate a detailed description for the team '{project_name}' with focus on the Managing Complexity dimension.\n\n"
-                    f"Here are the aggregate measures of the team scores per dimension:\n"
-                    f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that describes how the Managing Complexity score influences the team's ability to manage both complex and complicated problems."
-                )
-                
-            elif focus == "Strategic Hire Analysis":
-                prompt = (
-                    f"Generate a detailed description for the team '{project_name}' with focus on the Strategic Hire Analysis.\n\n"
+            prompt = (
+                f"Generate a detailed description for the team '{project_name}' with focus on the following score dimensions: {', '.join(dimensions)}.\n\n"
                 f"Here are the aggregate measures of the team scores per dimension:\n"
                 f"{'\n'.join(aggregate_texts)}\n\n"
-                f"Provide an analysis that uses the provided Attachment and Exploration scores to categorize individuals into one of the five result areas from the Strategic Hire Analysis: 1. Relationship-Optimization Quadrant (High Attachment score combined with Low Exploration Score), 2.Content-Optimization Quadrant (Low Attachment score with Low Exploration Score) , 3. Relationship-Exploration Quadrant (High Attachment score combined with High Exploration Score), 4. Content-Exploration Quadrant (Low Attachment Score combined with High Exploration score), 5. Strategic Execution Zone (Medium Attachment score combined with medium Exploration score). Based on the categorization, describe the team’s strengths and potential gaps in performance. Be sure to reflect on how the combination of the Attachment and Exploration dimensions shapes each individual’s contribution to the team."
-        )
-    
-            elif focus == "Business Performance":
-                prompt = (
-                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Business Performance Dialogue. The analysis should consider the team’s contributions in the following phases: 1. Changing with People (High Attachment & High Exploration), 2. Operational Core (Mid Attachment & Mid Exploration), 3. Structured Delivery (Low Attachment & Low Exploration)\n\n"
-                    f"Here is the distribution of the teammembers across the three phases:\n"
-                    f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that analyzes the distribution of teammembers across the three phases. Highlights how these contributions shape the team's performance and collaboration in each phase (e.g., driving change, converting ideas into projects, ensuring execution). Points out any gaps or underrepresented contributions in specific phases. Ideally, a well-balanced team has an even distribution of members across all three phases, ensuring the team is equipped to be effective in all areas. Suggests strategies to address these gaps, ensuring smoother transitions across phases."
-        )
-
-            elif focus == "Safeguarding Innovation":
-                prompt = (
-                    f"Generate a detailed analysis of the team '{project_name}' with focus on the Safeguarding Innovation Dialogue.\n\n"
-                    f"Here is the distribution of the teammembers across the three phases:\n"
-                    f"{'\n'.join(aggregate_texts)}\n\n"
-                    f"Provide an analysis that: Identifies how the teammembers are distributed across the three phases: Inventive Exploration, Operational Testing, and Sustaining with People. Highlights any gaps or areas where the team may lack strong contributions. Suggests how the team can better navigate the transition of ideas from research and experimentation to practical, sustainable implementation. Proposes strategies to address these gaps, including possible adjustments to team roles or introducing new perspectives to ensure successful embedding of innovations.  Ideally, a well-balanced team has an even distribution of members across all three phases, ensuring the team is equipped to be effective in all areas."
-        )
-
+		f"{focus_prompts.get(focus, '')}\n\n"
+                f"Provide an analysis that incorporates these scores and ratios to describe the team's performance and potential areas for improvement."
+            )
 
             # Request from OpenAI API
             response = client.chat.completions.create(
@@ -165,16 +176,6 @@ if uploaded_file is not None:
             # Append the generated content along with the focus to the descriptions list
             descriptions.append({"focus": focus, "description": generated_content})
 
-        # Prepare team member scores
-        for _, row in data.iterrows():
-            member_info = {
-                "name": row["Participant"],
-                "attachment_score": row["attachment score"],
-                "exploration_score": row["exploration score"],
-                "managing_complexity_score": row["managing complexity score"]
-            }
-            team_member_scores.append(member_info)
-
         # Display results
         st.subheader("Generated Descriptions")
         for desc in descriptions:
@@ -189,7 +190,6 @@ if uploaded_file is not None:
 
 else:
     st.warning("Please upload a CSV file.")
-
 
 
 
