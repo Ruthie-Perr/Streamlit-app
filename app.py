@@ -55,15 +55,19 @@ if uploaded_file is not None:
         # Process team members input (converting to list after splitting by commas)
         team_member_list = [member.strip() for member in team_members_input.split(",")] if team_members_input else []
 
-        # Filter based on project name or team members
- 	if project_name and team_member_list:
-    	# First, filter by project
-    	    data = data[data["Project"].str.lower() == project_name.lower()]
-    	# Then, filter by team members within the project
-    	    data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
-
+        # Filter based on project name and/or team members
+        if project_name and team_member_list:
+            # First, filter by project
+            data = data[data["Project"].str.lower() == project_name.lower()]
+            # Then, filter by team members within the project
+            data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
+        
         elif project_name:
             data = data[data["Project"].str.lower() == project_name.lower()]
+
+        elif team_member_list:
+            data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
+
 
         elif not project_name and team_member_list:
             data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
