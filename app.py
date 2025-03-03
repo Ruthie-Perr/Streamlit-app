@@ -58,9 +58,9 @@ if uploaded_file is not None:
         # Filter based on project name or team members
  	if project_name and team_member_list:
     	# First, filter by project
-    	data = data[data["Project"].str.lower() == project_name.lower()]
+    	    data = data[data["Project"].str.lower() == project_name.lower()]
     	# Then, filter by team members within the project
-    	data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
+    	    data = data[data["Participant"].str.lower().isin([member.lower() for member in team_member_list])]
 
         elif project_name:
             data = data[data["Project"].str.lower() == project_name.lower()]
