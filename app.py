@@ -51,7 +51,7 @@ if uploaded_file is not None:
     try:
         # Read the uploaded CSV into a pandas DataFrame
         data = pd.read_csv(uploaded_file)
-	data = data.drop(data.columns[7], axis=1) # Drop 8th column because of new format
+        data = data.drop(data.columns[7], axis=1) # Drop 8th column because of new format
 
         # Process team members input (converting to list after splitting by commas)
         team_member_list = [member.strip() for member in team_members_input.split(",")] if team_members_input else []
