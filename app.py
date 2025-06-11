@@ -124,6 +124,7 @@ if uploaded_file is not None:
         ratio_quadrant_2 = np.round(((data["attachment score"] > 50) & (data["exploration score"] < 51)).mean(), 2)
         ratio_quadrant_3 = np.round(((data["attachment score"] > 50) & (data["exploration score"] > 50)).mean(), 2)
         ratio_quadrant_4 = np.round(((data["attachment score"] < 51) & (data["exploration score"] > 50)).mean(), 2)
+	ratio_quadrant_5 = np.round(((test_team["attachment score"] >= 37.5) & (test_team["attachment score"] <= 62.5) & (test_team["exploration score"] >= 37.5) & (test_team["exploration score"] <= 62.5)).mean(), 2)
 
         # Prepare to generate descriptions
         descriptions = []
@@ -148,7 +149,8 @@ if uploaded_file is not None:
                     f"- Ratio of team members in the Content-Optimisation quadrant: {ratio_quadrant_1}",
                     f"- Ratio of team members in the Relationship-Optimisation quadrant: {ratio_quadrant_2}",
                     f"- Ratio of team members in the Relationship-Exploration quadrant: {ratio_quadrant_3}",
-                    f"- Ratio of team members in the Content-Exploration quadrant: {ratio_quadrant_4}"
+                    f"- Ratio of team members in the Content-Exploration quadrant: {ratio_quadrant_4}",
+                    f"- Ratio of team members in the Operational Core: {ratio_quadrant_5}",		
                 ]
             elif focus == "Business Performance":
                 combined_texts = [
@@ -181,7 +183,7 @@ if uploaded_file is not None:
                 model=MODEL_ID,  # Replace with your fine-tuned model ID
                 messages=[{"role": "system", "content": "You are a helpful assistant."},
                           {"role": "user", "content": prompt}],
-                temperature=0.4
+                temperature=0.7
             )
 
             # Accessing the generated content from the response
