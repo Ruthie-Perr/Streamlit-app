@@ -124,7 +124,7 @@ if uploaded_file is not None:
         ratio_quadrant_2 = np.round(((data["attachment score"] > 50) & (data["exploration score"] < 51)).mean(), 2)
         ratio_quadrant_3 = np.round(((data["attachment score"] > 50) & (data["exploration score"] > 50)).mean(), 2)
         ratio_quadrant_4 = np.round(((data["attachment score"] < 51) & (data["exploration score"] > 50)).mean(), 2)
-        ratio_quadrant_5 = np.round(((test_team["attachment score"] >= 37.5) & (test_team["attachment score"] <= 62.5) & (test_team["exploration score"] >= 37.5) & (test_team["exploration score"] <= 62.5)).mean(), 2)
+        ratio_quadrant_5 = np.round(((data["attachment score"] >= 37.5) & (test_team["attachment score"] <= 62.5) & (test_team["exploration score"] >= 37.5) & (test_team["exploration score"] <= 62.5)).mean(), 2)
 
         # Prepare to generate descriptions
         descriptions = []
