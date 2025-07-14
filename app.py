@@ -196,7 +196,7 @@ if uploaded_file is not None:
                 model=MODEL_ID,  # Replace with your fine-tuned model ID
                 messages=[{"role": "system", "content": "You are a helpful assistant."},
                           {"role": "user", "content": prompt}],
-                temperature=0.5
+                temperature=0.3
             )
 
             # Accessing the generated content from the response
