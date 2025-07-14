@@ -58,6 +58,19 @@ if uploaded_file is not None:
         # Process team members input (converting to list after splitting by commas)
         team_member_list = [member.strip() for member in team_members_input.split(",")] if team_members_input else []
 
+
+
+# Team Member validation here
+        if team_member_list:
+            available_members = data["Participant"].str.lower().unique()
+            entered_members = [member.lower() for member in team_member_list]
+            missing_members = [member for member in entered_members if member not in available_members]
+
+            if missing_members:
+                st.error(f"The following team members were not found in the data: {', '.join(missing_members)}")
+                st.stop()
+
+
         # Filter based on project name and/or team members
         if project_name and team_member_list:
             # First, filter by project
@@ -183,7 +196,7 @@ if uploaded_file is not None:
                 model=MODEL_ID,  # Replace with your fine-tuned model ID
                 messages=[{"role": "system", "content": "You are a helpful assistant."},
                           {"role": "user", "content": prompt}],
-                temperature=0.7
+                temperature=0.5
             )
 
             # Accessing the generated content from the response
