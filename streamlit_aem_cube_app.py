@@ -18,36 +18,39 @@ client = openai.Client(api_key=openai.api_key)
 # -----------------------------
 # Functions
 # -----------------------------
-import pdfplumber
-from io import BytesIO
 
 def extract_scores_from_pdf(pdf_file):
     scores = []
-    with pdfplumber.open(BytesIO(pdf_file.read())) as pdf:
+    with pdfplumber.open(pdf_file) as pdf:
         for page in pdf.pages:
-            lines = page.extract_text().splitlines()
-            for i in range(len(lines) - 5):
-                line0 = lines[i].strip().lower()
-                line1 = lines[i+1].strip().lower()
-                line2 = lines[i+2].strip().lower()
-                if (
-                    line0 == "attachment"
-                    and line1 in ["exploratie", "exploration"]
-                    and (line2.startswith("managen") or line2.startswith("managing"))
-                ):
-                    try:
-                        a = int(lines[i+3].strip())
-                        e = int(lines[i+4].strip())
-                        c = int(lines[i+5].strip())
-                        scores.append({
-                            "Project": "Team zelfbeelden",
-                            "attachment score": a,
-                            "exploration score": e,
-                            "managing complexity score": c
-                        })
-                    except ValueError:
-                        continue
+            text = page.extract_text()
+            if not text:
+                continue
+            lines = text.splitlines()
+            a = e = c = None
+            for line in lines:
+                line = line.strip().lower()
+                if line.startswith("attachment"):
+                    a_match = re.findall(r"\d+", line)
+                    if a_match:
+                        a = int(a_match[-1])
+                elif line.startswith("exploratie") or line.startswith("exploration"):
+                    e_match = re.findall(r"\d+", line)
+                    if e_match:
+                        e = int(e_match[-1])
+                elif line.startswith("managen") or line.startswith("managing"):
+                    c_match = re.findall(r"\d+", line)
+                    if c_match:
+                        c = int(c_match[-1])
+            if a is not None and e is not None and c is not None:
+                scores.append({
+                    "Project": "Team zelfbeelden",
+                    "attachment score": a,
+                    "exploration score": e,
+                    "managing complexity score": c
+                })
     return pd.DataFrame(scores)
+
 
 def generate_team_score_summary(focus, test_team):
     aggregate_measures = {}
