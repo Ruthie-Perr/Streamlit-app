@@ -1,0 +1,205 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import re
+import pdfplumber
+from io import BytesIO
+from openai import OpenAI
+
+# -----------------------------
+# Configuration
+# -----------------------------
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+# -----------------------------
+# Load theory and examples
+# -----------------------------
+with open("Foundational Info (1).txt", "r", encoding="utf-8") as f:
+    foundational_text = f.read()
+
+with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
+    description_text = f.read()
+
+def extract_theory_block(name, text):
+    focus_areas = {
+        "Product-Market Fit": ("1. Product-Market Fit", "2. Speed-to-Market"),
+        "Speed-to-Market": ("2. Speed-to-Market", "3. Strategic Agility Index Score"),
+        "Strategic Agility Index": ("3. Strategic Agility Index Score", "4. Strategic Hire Analysis"),
+        "Strategic Hire Analysis": ("4. Strategic Hire Analysis", "5. Business Performance"),
+        "Business Performance": ("5. Business Performance", "6. Safeguarding Innovation"),
+        "Safeguarding Innovation": ("6. Safeguarding Innovation", "7. Summary"),
+        "Summary": ("7. Summary", None)
+    }
+    start_tag, end_tag = focus_areas[name]
+    section = text.split(start_tag)[1]
+    return section.split(end_tag)[0].strip() if end_tag else section.strip()
+
+def extract_example_block(name, text):
+    if name in text:
+        section = text.split(name)[1]
+        return section.split("\n\n")[0].strip()
+    return ""
+
+# -----------------------------
+# Functions
+# -----------------------------
+def extract_scores_from_pdf(pdf_file):
+    scores = []
+    with pdfplumber.open(pdf_file) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text()
+            if not text:
+                continue
+            lines = text.splitlines()
+            a = e = c = None
+            for line in lines:
+                line = line.strip().lower()
+                if line.startswith("attachment"):
+                    a_match = re.findall(r"\d+", line)
+                    if a_match:
+                        a = int(a_match[-1])
+                elif line.startswith("exploratie") or line.startswith("exploration"):
+                    e_match = re.findall(r"\d+", line)
+                    if e_match:
+                        e = int(e_match[-1])
+                elif line.startswith("managen") or line.startswith("managing"):
+                    c_match = re.findall(r"\d+", line)
+                    if c_match:
+                        c = int(c_match[-1])
+            if a is not None and e is not None and c is not None:
+                scores.append({
+                    "Project": "Team zelfbeelden",
+                    "attachment score": a,
+                    "exploration score": e,
+                    "managing complexity score": c
+                })
+    return pd.DataFrame(scores)
+
+def generate_team_score_summary(focus, test_team):
+    aggregate_measures = {}
+    for dimension in ["attachment score", "exploration score", "managing complexity score"]:
+        scores = test_team[dimension]
+        aggregate_measures[dimension] = {
+            "mean": np.round(scores.mean(), 2),
+            "std_dev": np.round(scores.std(), 2),
+            "ratio_below_25": np.round((scores < 25).mean(), 2),
+            "ratio_25_50": np.round(((scores >= 25) & (scores < 50)).mean(), 2),
+            "ratio_50_75": np.round(((scores >= 50) & (scores < 75)).mean(), 2),
+            "ratio_above_75": np.round((scores >= 75).mean(), 2)
+        }
+
+    ratio_high_high = np.round(((test_team["attachment score"] > 65) & (test_team["exploration score"] > 65)).mean(), 2)
+    ratio_mid_mid = np.round(((test_team["attachment score"].between(35, 65)) & (test_team["exploration score"].between(35, 65))).mean(), 2)
+    ratio_low_low = np.round(((test_team["attachment score"] < 35) & (test_team["exploration score"] < 35)).mean(), 2)
+    ratio_low_high = np.round(((test_team["attachment score"] < 35) & (test_team["exploration score"] > 65)).mean(), 2)
+    ratio_high_low = np.round(((test_team["attachment score"] > 65) & (test_team["exploration score"] < 35)).mean(), 2)
+    ratio_quadrant_1 = np.round(((test_team["attachment score"] < 51) & (test_team["exploration score"] < 51)).mean(), 2)
+    ratio_quadrant_2 = np.round(((test_team["attachment score"] > 50) & (test_team["exploration score"] < 51)).mean(), 2)
+    ratio_quadrant_3 = np.round(((test_team["attachment score"] > 50) & (test_team["exploration score"] > 50)).mean(), 2)
+    ratio_quadrant_4 = np.round(((test_team["attachment score"] < 51) & (test_team["exploration score"] > 50)).mean(), 2)
+    ratio_quadrant_5 = np.round(((test_team["attachment score"].between(37.5, 62.5)) & (test_team["exploration score"].between(37.5, 62.5))).mean(), 2)
+
+    focus_to_dimensions = {
+        "Product-Market Fit": ["attachment score"],
+        "Speed-to-Market": ["exploration score"],
+        "Strategic Agility Index": ["managing complexity score"],
+        "Strategic Hire Analysis": [],
+        "Business Performance": [],
+        "Safeguarding Innovation": [],
+        "Summary": ["attachment score", "exploration score", "managing complexity score"]
+    }
+
+    aggregate_texts = []
+    if focus == "Strategic Hire Analysis":
+        combined_ratios = (
+            f"- **Ratio of team members in the Content-Optimisation quadrant**: {ratio_quadrant_1}\n"
+            f"- **Ratio of team members in the Relationship-Optimisation quadrant**: {ratio_quadrant_2}\n"
+            f"- **Ratio of team members in the Relationship-Exploration quadrant**: {ratio_quadrant_3}\n"
+            f"- **Ratio of team members in the Content-Exploration quadrant**: {ratio_quadrant_4}\n"
+            f"- **Ratio of team members in the Operational Core**: {ratio_quadrant_5}\n"
+        )
+        aggregate_texts.append(f"Combined Ratios for Strategic Hire Analysis:\n{combined_ratios}")
+    elif focus == "Business Performance":
+        combined_ratios = (
+            f"- **Ratio of team members in Phase 1: with Attachment & Exploration > 65**: {ratio_high_high}\n"
+            f"- **Ratio of team members in Phase 2: with Attachment & Exploration between 35-65**: {ratio_mid_mid}\n"
+            f"- **Ratio of team members in Phase 3: with Attachment & Exploration < 35**: {ratio_low_low}\n"
+        )
+        aggregate_texts.append(f"Combined Ratios for Business Performance:\n{combined_ratios}")
+    elif focus == "Safeguarding Innovation":
+        combined_ratios = (
+            f"- **Ratio of team members in Phase 1: with Attachment < 35 & Exploration > 65**: {ratio_low_high}\n"
+            f"- **Ratio of team members in Phase 2: with Attachment between 35-65 & Exploration between 35-65**: {ratio_mid_mid}\n"
+            f"- **Ratio of team members in Phase 3: with Attachment > 65 & Exploration < 35**: {ratio_high_low}\n"
+        )
+        aggregate_texts.append(f"Combined Ratios for Safeguarding Innovation:\n{combined_ratios}")
+    else:
+        for dim in focus_to_dimensions[focus]:
+            agg = aggregate_measures[dim]
+            aggregate_texts.append(
+                f"- **{dim.replace('_', ' ').title()}**\n"
+                f"  - Mean: {agg['mean']}\n"
+                f"  - Standard Deviation: {agg['std_dev']}\n"
+                f"  - Ratio below 25: {agg['ratio_below_25']}\n"
+                f"  - Ratio 25-50: {agg['ratio_25_50']}\n"
+                f"  - Ratio 50-75: {agg['ratio_50_75']}\n"
+                f"  - Ratio above 75: {agg['ratio_above_75']}"
+            )
+    return "\n".join(aggregate_texts)
+
+# -----------------------------
+# Streamlit UI
+# -----------------------------
+st.title("AEM-Cube Team Analysis")
+uploaded_file = st.file_uploader("Upload AEM-Cube Team PDF", type="pdf")
+
+if uploaded_file:
+    with st.spinner("Extracting scores and generating analyses..."):
+        test_team = extract_scores_from_pdf(uploaded_file)
+        if test_team.empty:
+            st.error("No scores could be extracted from this PDF.")
+        else:
+            st.success("Scores extracted successfully.")
+            st.dataframe(test_team)
+
+            focus_areas = [
+                "Product-Market Fit", "Speed-to-Market", "Strategic Agility Index",
+                "Strategic Hire Analysis", "Business Performance", "Safeguarding Innovation", "Summary"
+            ]
+
+            for focus in focus_areas:
+                st.subheader(focus)
+                team_scores = generate_team_score_summary(focus, test_team)
+                theory = extract_theory_block(focus, foundational_text)
+                example = extract_example_block(focus, description_text)
+
+                prompt = f"""
+You are an expert team analyst using the AEM-Cube framework.
+
+Here is the theory:
+{theory}
+
+Here is an example of a {focus} analysis:
+{example}
+
+Use the following score data to write a cohesive {focus} analysis.
+
+Team Score Summary:
+{team_scores}
+
+Be concise (2–3 paragraphs). Only describe imbalances or risks if they appear in the score profile. If the team appears balanced, state that clearly and avoid inventing blind spots. Conclude with a recommendation only if meaningful.
+
+Your goal is to deliver a professional, high-value insight that flows logically and is easy to understand.
+"""
+
+                response = client.chat.completions.create(
+                    model="gpt-4-1106-preview",
+                    messages=[
+                        {"role": "system", "content": "You are a structured and insightful team analyst."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.3
+                )
+
+                analysis = response.choices[0].message.content
+                st.markdown(analysis)
