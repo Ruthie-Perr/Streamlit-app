@@ -1,9 +1,11 @@
 import streamlit as st
-import fitz
 import pandas as pd
 import numpy as np
 import openai
 import re
+import pdfplumber
+from io import BytesIO
+
 
 # -----------------------------
 # Configuration
@@ -16,32 +18,35 @@ MODEL_ID = st.secrets["MODEL_ID"]
 # -----------------------------
 # Functions
 # -----------------------------
+import pdfplumber
+from io import BytesIO
+
 def extract_scores_from_pdf(pdf_file):
-    doc = fitz.open(stream=pdf_file.read(), filetype="pdf")
     scores = []
-    for page in doc:
-        lines = page.get_text("text").splitlines()
-        for i in range(len(lines) - 5):
-            line0 = lines[i].strip().lower()
-            line1 = lines[i+1].strip().lower()
-            line2 = lines[i+2].strip().lower()
-            if (
-                line0 == "attachment"
-                and line1 in ["exploratie", "exploration"]
-                and (line2.startswith("managen") or line2.startswith("managing"))
-            ):
-                try:
-                    a = int(lines[i+3].strip())
-                    e = int(lines[i+4].strip())
-                    c = int(lines[i+5].strip())
-                    scores.append({
-                        "Project": "Uploaded PDF",
-                        "attachment score": a,
-                        "exploration score": e,
-                        "managing complexity score": c
-                    })
-                except ValueError:
-                    continue
+    with pdfplumber.open(BytesIO(pdf_file.read())) as pdf:
+        for page in pdf.pages:
+            lines = page.extract_text().splitlines()
+            for i in range(len(lines) - 5):
+                line0 = lines[i].strip().lower()
+                line1 = lines[i+1].strip().lower()
+                line2 = lines[i+2].strip().lower()
+                if (
+                    line0 == "attachment"
+                    and line1 in ["exploratie", "exploration"]
+                    and (line2.startswith("managen") or line2.startswith("managing"))
+                ):
+                    try:
+                        a = int(lines[i+3].strip())
+                        e = int(lines[i+4].strip())
+                        c = int(lines[i+5].strip())
+                        scores.append({
+                            "Project": "Team zelfbeelden",
+                            "attachment score": a,
+                            "exploration score": e,
+                            "managing complexity score": c
+                        })
+                    except ValueError:
+                        continue
     return pd.DataFrame(scores)
 
 def generate_team_score_summary(focus, test_team):
