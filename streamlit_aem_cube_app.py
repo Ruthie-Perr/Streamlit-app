@@ -99,7 +99,7 @@ def generate_team_score_summary(focus, test_team):
     ratio_quadrant_5 = np.round(((test_team["attachment score"].between(37.5, 62.5)) & (test_team["exploration score"].between(37.5, 62.5))).mean(), 2)
 
     focus_to_dimensions = {
-        "Product-Market-Fit": ["attachment score"],
+        "Product-Market Fit": ["attachment score"],
         "Speed-to-Market": ["exploration score"],
         "Strategic Agility Index": ["managing complexity score"],
         "Strategic Hire Analysis": [],
