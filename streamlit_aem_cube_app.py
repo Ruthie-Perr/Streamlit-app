@@ -1,24 +1,48 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import openai
 import re
 import pdfplumber
 from io import BytesIO
-
+from openai import OpenAI
 
 # -----------------------------
 # Configuration
 # -----------------------------
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-client = openai.Client(api_key=openai.api_key)
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# MODEL_ID = st.secrets["MODEL_ID"]
+# -----------------------------
+# Load theory and examples
+# -----------------------------
+with open("Foundational Info (1).txt", "r", encoding="utf-8") as f:
+    foundational_text = f.read()
+
+with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
+    description_text = f.read()
+
+def extract_theory_block(name, text):
+    focus_areas = {
+        "Product-Market Fit": ("1. Product-Market Fit", "2. Speed-to-Market"),
+        "Speed-to-Market": ("2. Speed-to-Market", "3. Strategic Agility Index Score"),
+        "Strategic Agility Index": ("3. Strategic Agility Index Score", "4. Strategic Hire Analysis"),
+        "Strategic Hire Analysis": ("4. Strategic Hire Analysis", "5. Business Performance"),
+        "Business Performance": ("5. Business Performance", "6. Safeguarding Innovation"),
+        "Safeguarding Innovation": ("6. Safeguarding Innovation", "7. Summary"),
+        "Summary": ("7. Summary", None)
+    }
+    start_tag, end_tag = focus_areas[name]
+    section = text.split(start_tag)[1]
+    return section.split(end_tag)[0].strip() if end_tag else section.strip()
+
+def extract_example_block(name, text):
+    if name in text:
+        section = text.split(name)[1]
+        return section.split("\n\n")[0].strip()
+    return ""
 
 # -----------------------------
 # Functions
 # -----------------------------
-
 def extract_scores_from_pdf(pdf_file):
     scores = []
     with pdfplumber.open(pdf_file) as pdf:
@@ -50,7 +74,6 @@ def extract_scores_from_pdf(pdf_file):
                     "managing complexity score": c
                 })
     return pd.DataFrame(scores)
-
 
 def generate_team_score_summary(focus, test_team):
     aggregate_measures = {}
@@ -147,9 +170,17 @@ if uploaded_file:
             for focus in focus_areas:
                 st.subheader(focus)
                 team_scores = generate_team_score_summary(focus, test_team)
+                theory = extract_theory_block(focus, foundational_text)
+                example = extract_example_block(focus, description_text)
 
                 prompt = f"""
 You are an expert team analyst using the AEM-Cube framework.
+
+Here is the theory:
+{theory}
+
+Here is an example of a {focus} analysis:
+{example}
 
 Use the following score data to write a cohesive {focus} analysis.
 
@@ -160,7 +191,6 @@ Be concise (2–3 paragraphs). Only describe imbalances or risks if they appear 
 
 Your goal is to deliver a professional, high-value insight that flows logically and is easy to understand.
 """
-
 
                 response = client.chat.completions.create(
                     model="gpt-4-1106-preview",
