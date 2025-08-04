@@ -5,19 +5,21 @@ import re
 import pdfplumber
 from io import BytesIO
 from openai import OpenAI
+import tiktoken
 
 # -----------------------------
 # Configuration
 # -----------------------------
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+encoding = tiktoken.encoding_for_model("gpt-4")
 
 # -----------------------------
 # Load theory and examples
 # -----------------------------
-with open("Foundational Info (1).txt", "r", encoding="utf-8") as f:
+with open("Foundational Info.txt", "r", encoding="utf-8") as f:
     foundational_text = f.read()
 
-with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
+with open("Descriptions.txt", "r", encoding="utf-8") as f:
     description_text = f.read()
 
 def extract_theory_block(name, text):
@@ -40,9 +42,6 @@ def extract_example_block(name, text):
         return section.split("\n\n")[0].strip()
     return ""
 
-# -----------------------------
-# Functions
-# -----------------------------
 def extract_scores_from_pdf(pdf_file):
     scores = []
     with pdfplumber.open(pdf_file) as pdf:
@@ -112,45 +111,41 @@ def generate_team_score_summary(focus, test_team):
     aggregate_texts = []
     if focus == "Strategic Hire Analysis":
         combined_ratios = (
-            f"- **Ratio of team members in the Content-Optimisation quadrant**: {ratio_quadrant_1}\n"
-            f"- **Ratio of team members in the Relationship-Optimisation quadrant**: {ratio_quadrant_2}\n"
-            f"- **Ratio of team members in the Relationship-Exploration quadrant**: {ratio_quadrant_3}\n"
-            f"- **Ratio of team members in the Content-Exploration quadrant**: {ratio_quadrant_4}\n"
-            f"- **Ratio of team members in the Operational Core**: {ratio_quadrant_5}\n"
+            f"- Content-Optimisation: {ratio_quadrant_1}\n"
+            f"- Relationship-Optimisation: {ratio_quadrant_2}\n"
+            f"- Relationship-Exploration: {ratio_quadrant_3}\n"
+            f"- Content-Exploration: {ratio_quadrant_4}\n"
+            f"- Operational Core: {ratio_quadrant_5}\n"
         )
-        aggregate_texts.append(f"Combined Ratios for Strategic Hire Analysis:\n{combined_ratios}")
+        aggregate_texts.append(combined_ratios)
     elif focus == "Business Performance":
         combined_ratios = (
-            f"- **Ratio of team members in Phase 1: with Attachment & Exploration > 65**: {ratio_high_high}\n"
-            f"- **Ratio of team members in Phase 2: with Attachment & Exploration between 35-65**: {ratio_mid_mid}\n"
-            f"- **Ratio of team members in Phase 3: with Attachment & Exploration < 35**: {ratio_low_low}\n"
+            f"- Phase 1 (A&E > 65): {ratio_high_high}\n"
+            f"- Phase 2 (A&E 35-65): {ratio_mid_mid}\n"
+            f"- Phase 3 (A&E < 35): {ratio_low_low}\n"
         )
-        aggregate_texts.append(f"Combined Ratios for Business Performance:\n{combined_ratios}")
+        aggregate_texts.append(combined_ratios)
     elif focus == "Safeguarding Innovation":
         combined_ratios = (
-            f"- **Ratio of team members in Phase 1: with Attachment < 35 & Exploration > 65**: {ratio_low_high}\n"
-            f"- **Ratio of team members in Phase 2: with Attachment between 35-65 & Exploration between 35-65**: {ratio_mid_mid}\n"
-            f"- **Ratio of team members in Phase 3: with Attachment > 65 & Exploration < 35**: {ratio_high_low}\n"
+            f"- Phase 1 (A < 35 & E > 65): {ratio_low_high}\n"
+            f"- Phase 2 (35-65): {ratio_mid_mid}\n"
+            f"- Phase 3 (A > 65 & E < 35): {ratio_high_low}\n"
         )
-        aggregate_texts.append(f"Combined Ratios for Safeguarding Innovation:\n{combined_ratios}")
+        aggregate_texts.append(combined_ratios)
     else:
         for dim in focus_to_dimensions[focus]:
             agg = aggregate_measures[dim]
             aggregate_texts.append(
-                f"- **{dim.replace('_', ' ').title()}**\n"
-                f"  - Mean: {agg['mean']}\n"
-                f"  - Standard Deviation: {agg['std_dev']}\n"
-                f"  - Ratio below 25: {agg['ratio_below_25']}\n"
-                f"  - Ratio 25-50: {agg['ratio_25_50']}\n"
-                f"  - Ratio 50-75: {agg['ratio_50_75']}\n"
-                f"  - Ratio above 75: {agg['ratio_above_75']}"
+                f"{dim.replace('_', ' ').title()}\n"
+                f"Mean: {agg['mean']}, Std Dev: {agg['std_dev']}\n"
+                f"Below 25: {agg['ratio_below_25']}, 25-50: {agg['ratio_25_50']}, 50-75: {agg['ratio_50_75']}, >75: {agg['ratio_above_75']}"
             )
     return "\n".join(aggregate_texts)
 
 # -----------------------------
 # Streamlit UI
 # -----------------------------
-st.title("AEM-Cube Team Analysis")
+st.title("AEM-Cube Team Analysis (Debug Mode)")
 uploaded_file = st.file_uploader("Upload AEM-Cube Team PDF", type="pdf")
 
 if uploaded_file:
@@ -176,21 +171,28 @@ if uploaded_file:
                 prompt = f"""
 You are an expert team analyst using the AEM-Cube framework.
 
-Here is the theory:
+### THEORY
+```text
 {theory}
+```
 
-Here is an example of a {focus} analysis:
+### EXAMPLE
+```text
 {example}
+```
 
-Use the following score data to write a cohesive {focus} analysis.
-
-Team Score Summary:
+### TEAM SCORES
 {team_scores}
 
-Be concise (2–3 paragraphs). Only describe imbalances or risks if they appear in the score profile. If the team appears balanced, state that clearly and avoid inventing blind spots. Conclude with a recommendation only if meaningful.
-
-Your goal is to deliver a professional, high-value insight that flows logically and is easy to understand.
+Now generate a {focus} analysis. Be concise, logical, and aligned with the theory. Only highlight imbalances if the data shows it. Never contradict the above context.
 """
+
+                token_count = len(encoding.encode(prompt))
+                if token_count > 7000:
+                    st.warning(f"⚠️ Prompt is {token_count} tokens long. This may cause truncation or hallucinations.")
+
+                with st.expander("🧠 Show Prompt"):
+                    st.code(prompt)
 
                 response = client.chat.completions.create(
                     model="gpt-4-1106-preview",
@@ -201,5 +203,4 @@ Your goal is to deliver a professional, high-value insight that flows logically 
                     temperature=0.3
                 )
 
-                analysis = response.choices[0].message.content
-                st.markdown(analysis)
+                st.markdown(response.choices[0].message.content)
