@@ -13,7 +13,7 @@ from io import BytesIO
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 client = openai.Client(api_key=openai.api_key)
 
-MODEL_ID = st.secrets["MODEL_ID"]
+# MODEL_ID = st.secrets["MODEL_ID"]
 
 # -----------------------------
 # Functions
