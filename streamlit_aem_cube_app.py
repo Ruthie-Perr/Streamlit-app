@@ -24,7 +24,7 @@ with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
 
 def extract_theory_block(name, text):
     focus_areas = {
-        "Product-Market Fit": ("1. Product-Market Fit", "2. Speed-to-Market"),
+        "Product-Market Fit": ("1. Product-Market-Fit", "2. Speed-to-Market"),
         "Speed-to-Market": ("2. Speed-to-Market", "3. Strategic Agility Index Score"),
         "Strategic Agility Index": ("3. Strategic Agility Index Score", "4. Strategic Hire Analysis"),
         "Strategic Hire Analysis": ("4. Strategic Hire Analysis", "5. Business Performance"),
