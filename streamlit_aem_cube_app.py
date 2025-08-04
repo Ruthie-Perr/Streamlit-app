@@ -16,7 +16,7 @@ encoding = tiktoken.encoding_for_model("gpt-4")
 # -----------------------------
 # Load theory and examples
 # -----------------------------
-with open("FFoundational Info (1).txt", "r", encoding="utf-8") as f:
+with open("Foundational Info (1).txt", "r", encoding="utf-8") as f:
     foundational_text = f.read()
 
 with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
