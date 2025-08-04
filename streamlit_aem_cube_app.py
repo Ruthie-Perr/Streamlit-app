@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import openai
+from openai import OpenAI
 import re
 import pdfplumber
 from io import BytesIO
@@ -161,7 +161,8 @@ Be concise (2–3 paragraphs). Only describe imbalances or risks if they appear 
 Your goal is to deliver a professional, high-value insight that flows logically and is easy to understand.
 """
 
-                response = openai.ChatCompletion.create(
+
+                response = client.chat.completions.create(
                     model="gpt-4-1106-preview",
                     messages=[
                         {"role": "system", "content": "You are a structured and insightful team analyst."},
@@ -170,5 +171,5 @@ Your goal is to deliver a professional, high-value insight that flows logically 
                     temperature=0.3
                 )
 
-                analysis = response["choices"][0]["message"]["content"]
+                analysis = response.choices[0].message.content
                 st.markdown(analysis)
