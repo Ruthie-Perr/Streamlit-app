@@ -1,21 +1,21 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import openai
 import pdfplumber
 from io import BytesIO
+from openai import OpenAI
 
 # --- Config ---
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # --- Helper: Embed text with OpenAI ---
 @st.cache_data(show_spinner=False)
 def embed_text(texts):
-    response = openai.Embedding.create(
+    response = client.embeddings.create(
         model="text-embedding-3-small",
         input=texts
     )
-    return np.array([r["embedding"] for r in response["data"]])
+    return np.array([r.embedding for r in response.data])
 
 # --- Helper: Extract job description text from uploaded PDF ---
 def extract_text_from_pdf(file):
@@ -73,7 +73,7 @@ if uploaded_pdf:
     )
 
     with st.spinner("Generating output..."):
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a highly precise job design expert."},
@@ -84,3 +84,4 @@ if uploaded_pdf:
         result = response.choices[0].message.content
         st.subheader("📄 Suggested Result Areas")
         st.markdown(result)
+
