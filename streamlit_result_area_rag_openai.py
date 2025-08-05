@@ -59,23 +59,18 @@ if uploaded_pdf:
     context = "\n".join(df.iloc[top_idx]["combined"].tolist())
 
     # Prompt GPT-3.5
-    prompt = f"""You are an expert in translating job descriptions into strategic Result Areas and AEM-Cube bandwidths.
-
-Based on the following relevant examples:
-{context}
-
-Now read this job description:
-{query_text}
-
-Generate 4–5 distinct Result Areas, each with a matching AEM Bandwidth range. Do not copy from the examples — infer what fits best. Format the output clearly and concisely.
-
-Respond in this format:
-
-1. [Result Area Title]
-AEM Bandwidth: [range]
-[Optional 1-line explanation]
-
-Repeat for each.\""
+    prompt = (
+        "You are an expert in translating job descriptions into strategic Result Areas and AEM-Cube bandwidths.\n\n"
+        f"Based on the following relevant examples:\n{context}\n\n"
+        f"Now read this job description:\n{query_text}\n\n"
+        "Generate 4–5 distinct Result Areas, each with a matching AEM Bandwidth range. "
+        "Do not copy from the examples — infer what fits best. Format the output clearly and concisely.\n\n"
+        "Respond in this format:\n\n"
+        "1. [Result Area Title]\n"
+        "AEM Bandwidth: [range]\n"
+        "[Optional 1-line explanation]\n\n"
+        "Repeat for each."
+    )
 
     with st.spinner("Generating output..."):
         response = openai.ChatCompletion.create(
