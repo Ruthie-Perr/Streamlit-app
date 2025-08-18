@@ -54,7 +54,7 @@ def extract_scores_from_pdf(pdf_file_like) -> pd.DataFrame:
             a, e, c = None, None, None, None
             for raw in text.splitlines():
                 ls = raw.strip().lower()
-                elif ls.startswith("attachment"):
+                if ls.startswith("attachment"):
                     a = _last_int(raw)
                 elif ls.startswith(("exploration", "exploratie")):
                     e = _last_int(raw)
@@ -174,6 +174,7 @@ if uploaded_file is not None:
         st.error(f"Error: {e}")
 else:
     st.warning("Please upload a PDF file.")
+
 
 
 
