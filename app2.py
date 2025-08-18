@@ -97,8 +97,7 @@ def extract_scores_from_pdf(pdf_file_like, project_name: str = "Team zelfbeelden
 st.title("AI Team Analyses")
 
 uploaded_file = st.file_uploader("Upload PDF file", type=["pdf"])
-project_name = st.text_input("Project Name")
-team_members_input = st.text_area("Enter Team Members (comma-separated)", "")
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Main flow (PDF only)
@@ -243,4 +242,5 @@ if uploaded_file is not None:
         st.error(f"An error occurred: {str(e)}")
 else:
     st.warning("Please upload a PDF file.")
+
 
