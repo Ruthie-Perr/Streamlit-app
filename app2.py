@@ -51,11 +51,9 @@ def extract_scores_from_pdf(pdf_file_like) -> pd.DataFrame:
             if not text.strip():
                 continue
 
-            participant, a, e, c = None, None, None, None
+            a, e, c = None, None, None, None
             for raw in text.splitlines():
                 ls = raw.strip().lower()
-                if ls.startswith(("participant:", "name:")):
-                    participant = raw.split(":", 1)[-1].strip()
                 elif ls.startswith("attachment"):
                     a = _last_int(raw)
                 elif ls.startswith(("exploration", "exploratie")):
@@ -65,7 +63,6 @@ def extract_scores_from_pdf(pdf_file_like) -> pd.DataFrame:
 
             if a is not None and e is not None and c is not None:
                 rows.append({
-                    "Participant": participant or f"Unknown_{len(rows)+1}",
                     "attachment score": a,
                     "exploration score": e,
                     "managing complexity score": c,
@@ -76,7 +73,7 @@ def extract_scores_from_pdf(pdf_file_like) -> pd.DataFrame:
 # ────────────────────────────────────────────
 # UI
 # ────────────────────────────────────────────
-st.title("AI Team Analyses (PDF only)")
+st.title("AI Team Analyses (PDF input)")
 
 uploaded_file = st.file_uploader("Upload PDF file", type=["pdf"])
 
@@ -84,10 +81,9 @@ if uploaded_file is not None:
     try:
         # Extract scores
         data = extract_scores_from_pdf(uploaded_file)
-        data = data.drop_duplicates(subset="Participant")
 
         if data.empty:
-            st.error("No participants found in the PDF.")
+            st.error("Error.")
             st.stop()
 
         # Aggregate measures
@@ -178,6 +174,7 @@ if uploaded_file is not None:
         st.error(f"Error: {e}")
 else:
     st.warning("Please upload a PDF file.")
+
 
 
 
