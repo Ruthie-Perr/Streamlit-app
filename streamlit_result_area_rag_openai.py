@@ -56,13 +56,7 @@ if uploaded_pdf:
     sims = cosine_similarity(example_embeds, query_embed)
     top_idx = sims.argsort()[::-1][:4]
 
-    st.success("✅ Found relevant result areas:")
-    for i in top_idx:
-        st.markdown(f"**• {df.iloc[i]['Resultaatgebied']}**")
-        st.markdown(f"Attachment: {df.iloc[i]['Attachment']}")
-        st.markdown(f"Exploratie: {df.iloc[i]['Exploratie']}")
-        st.markdown(f"Managen Complexiteit: {df.iloc[i]['Managen van Complexiteit']}")
-        st.markdown("---")
+
 
     # Combine top matches for prompt context
     context = "\n".join(df.iloc[top_idx]["combined"].tolist())
@@ -91,6 +85,6 @@ if uploaded_pdf:
             temperature=0.4
         )
         result = response.choices[0].message.content
-        st.subheader("🔎 Suggested Result Areas")
+        st.subheader("Suggested Result Areas")
         st.markdown(result)
 
