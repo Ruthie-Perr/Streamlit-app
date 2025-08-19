@@ -44,7 +44,7 @@ def load_examples():
     return df, embeddings
 
 # --- UI ---
-st.title("📄 Result Area Generator (RAG-powered)")
+st.title("📄 Result Area Generator")
 uploaded_pdf = st.file_uploader("Upload Job Description (PDF)", type="pdf")
 
 if uploaded_pdf:
