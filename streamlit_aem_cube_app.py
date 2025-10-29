@@ -24,7 +24,7 @@ with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
 
 def extract_theory_block(name, text):
     focus_areas = {
-        "Product-Market Fit": ("1. Product-Market-Fit", "2. Speed-to-Market"),
+        "Product-Market-Fit": ("1. Product-Market-Fit", "2. Speed-to-Market"),
         "Speed-to-Market": ("2. Speed-to-Market", "3. Strategic Agility Index Score"),
         "Strategic Agility Index": ("3. Strategic Agility Index Score", "4. Strategic Hire Analysis"),
         "Strategic Hire Analysis": ("4. Strategic Hire Analysis", "5. Business Performance"),
@@ -227,7 +227,7 @@ You are an expert team analyst using the AEM-Cube framework.
 
 {('### COMBINED RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
 
-Now generate a {focus} analysis. Be concise, logical, and aligned with the theory.
+Now generate a {focus} analysis using the framework of the example but for the scores provided. Be concise, logical, and aligned with the theory.
 Only highlight imbalances if the data shows it. Never contradict the above context.
 """
 
