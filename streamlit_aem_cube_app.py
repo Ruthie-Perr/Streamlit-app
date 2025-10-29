@@ -113,7 +113,7 @@ def compute_team_stats(test_team):
 
 def format_team_sections(focus, stats):
     focus_to_dimensions = {
-        "Product-Market Fit": ["attachment score"],
+        "Product-Market-Fit": ["attachment score"],
         "Speed-to-Market": ["exploration score"],
         "Strategic Agility Index": ["managing complexity score"],
         "Strategic Hire Analysis": [],  # uses combined
@@ -189,7 +189,7 @@ if uploaded_file:
             st.dataframe(test_team)
 
             focus_areas = [
-                "Product-Market Fit", "Speed-to-Market", "Strategic Agility Index",
+                "Product-Market-Fit", "Speed-to-Market", "Strategic Agility Index",
                 "Strategic Hire Analysis", "Business Performance", "Safeguarding Innovation", "Summary"
             ]
 
