@@ -74,73 +74,104 @@ def extract_scores_from_pdf(pdf_file):
                 })
     return pd.DataFrame(scores)
 
-def generate_team_score_summary(focus, test_team):
-    aggregate_measures = {}
-    for dimension in ["attachment score", "exploration score", "managing complexity score"]:
-        scores = test_team[dimension]
-        aggregate_measures[dimension] = {
-            "mean": np.round(scores.mean(), 2),
-            "std_dev": np.round(scores.std(), 2),
-            "ratio_below_25": np.round((scores < 25).mean(), 2),
-            "ratio_25_50": np.round(((scores >= 25) & (scores < 50)).mean(), 2),
-            "ratio_50_75": np.round(((scores >= 50) & (scores < 75)).mean(), 2),
-            "ratio_above_75": np.round((scores >= 75).mean(), 2)
+def compute_team_stats(test_team):
+    dims = ["attachment score", "exploration score", "managing complexity score"]
+
+    metrics = {}
+    proportions = {}
+    for dim in dims:
+        s = test_team[dim]
+        metrics[dim] = {
+            "mean": float(np.round(s.mean(), 2)),
+            "std_dev": float(np.round(s.std(ddof=0), 2)),  # population SD for stability; change to ddof=1 if you prefer sample SD
+        }
+        proportions[dim] = {
+            "ratio_below_25": float(np.round((s < 25).mean(), 2)),
+            "ratio_25_50": float(np.round(((s >= 25) & (s < 50)).mean(), 2)),
+            "ratio_50_75": float(np.round(((s >= 50) & (s < 75)).mean(), 2)),
+            "ratio_above_75": float(np.round((s >= 75).mean(), 2)),
         }
 
-    ratio_high_high = np.round(((test_team["attachment score"] > 65) & (test_team["exploration score"] > 65)).mean(), 2)
-    ratio_mid_mid = np.round(((test_team["attachment score"].between(35, 65)) & (test_team["exploration score"].between(35, 65))).mean(), 2)
-    ratio_low_low = np.round(((test_team["attachment score"] < 35) & (test_team["exploration score"] < 35)).mean(), 2)
-    ratio_low_high = np.round(((test_team["attachment score"] < 35) & (test_team["exploration score"] > 65)).mean(), 2)
-    ratio_high_low = np.round(((test_team["attachment score"] > 65) & (test_team["exploration score"] < 35)).mean(), 2)
-    ratio_quadrant_1 = np.round(((test_team["attachment score"] < 51) & (test_team["exploration score"] < 51)).mean(), 2)
-    ratio_quadrant_2 = np.round(((test_team["attachment score"] > 50) & (test_team["exploration score"] < 51)).mean(), 2)
-    ratio_quadrant_3 = np.round(((test_team["attachment score"] > 50) & (test_team["exploration score"] > 50)).mean(), 2)
-    ratio_quadrant_4 = np.round(((test_team["attachment score"] < 51) & (test_team["exploration score"] > 50)).mean(), 2)
-    ratio_quadrant_5 = np.round(((test_team["attachment score"].between(37.5, 62.5)) & (test_team["exploration score"].between(37.5, 62.5))).mean(), 2)
+    # Cross-dimension combined ratios (A vs E) for special focuses
+    A = test_team["attachment score"]
+    E = test_team["exploration score"]
+    combined = {
+        "ratio_high_high": float(np.round(((A > 65) & (E > 65)).mean(), 2)),
+        "ratio_mid_mid":   float(np.round((A.between(35, 65) & E.between(35, 65)).mean(), 2)),
+        "ratio_low_low":   float(np.round(((A < 35) & (E < 35)).mean(), 2)),
+        "ratio_low_high":  float(np.round(((A < 35) & (E > 65)).mean(), 2)),
+        "ratio_high_low":  float(np.round(((A > 65) & (E < 35)).mean(), 2)),
+        "ratio_quadrant_1": float(np.round(((A < 51) & (E < 51)).mean(), 2)),  # Content-Optimisation
+        "ratio_quadrant_2": float(np.round(((A > 50) & (E < 51)).mean(), 2)),  # Relationship-Optimisation
+        "ratio_quadrant_3": float(np.round(((A > 50) & (E > 50)).mean(), 2)),  # Relationship-Exploration
+        "ratio_quadrant_4": float(np.round(((A < 51) & (E > 50)).mean(), 2)),  # Content-Exploration
+        "ratio_quadrant_5": float(np.round((A.between(37.5, 62.5) & E.between(37.5, 62.5)).mean(), 2)),  # Operational Core
+    }
 
+    return {"metrics": metrics, "proportions": proportions, "combined": combined}
+
+
+def format_team_sections(focus, stats):
     focus_to_dimensions = {
         "Product-Market Fit": ["attachment score"],
         "Speed-to-Market": ["exploration score"],
         "Strategic Agility Index": ["managing complexity score"],
-        "Strategic Hire Analysis": [],
-        "Business Performance": [],
-        "Safeguarding Innovation": [],
+        "Strategic Hire Analysis": [],  # uses combined
+        "Business Performance": [],     # uses combined
+        "Safeguarding Innovation": [],  # uses combined
         "Summary": ["attachment score", "exploration score", "managing complexity score"]
     }
 
-    aggregate_texts = []
+    dims = focus_to_dimensions[focus]
+    metrics_lines = []
+    props_lines = []
+
+    # Always format metrics & proportions when dimensions are defined
+    for dim in dims:
+        m = stats["metrics"][dim]
+        p = stats["proportions"][dim]
+        title = dim.replace("_", " ").title()
+        metrics_lines.append(f"- {title}: mean={m['mean']}, sd={m['std_dev']}")
+        props_lines.append(
+            f"- {title}: <25={p['ratio_below_25']}, 25-50={p['ratio_25_50']}, 50-75={p['ratio_50_75']}, >75={p['ratio_above_75']}"
+        )
+
+    metrics_block = "\n".join(metrics_lines) if metrics_lines else "(not applicable)"
+    proportions_block = "\n".join(props_lines) if props_lines else "(not applicable)"
+
+    # Optional combined section for the special focuses
+    combined_block = ""
     if focus == "Strategic Hire Analysis":
-        combined_ratios = (
-            f"- Content-Optimisation: {ratio_quadrant_1}\n"
-            f"- Relationship-Optimisation: {ratio_quadrant_2}\n"
-            f"- Relationship-Exploration: {ratio_quadrant_3}\n"
-            f"- Content-Exploration: {ratio_quadrant_4}\n"
-            f"- Operational Core: {ratio_quadrant_5}\n"
+        c = stats["combined"]
+        combined_block = (
+            "Content-Optimisation: {q1}\n"
+            "Relationship-Optimisation: {q2}\n"
+            "Relationship-Exploration: {q3}\n"
+            "Content-Exploration: {q4}\n"
+            "Operational Core: {q5}"
+        ).format(
+            q1=c["ratio_quadrant_1"],
+            q2=c["ratio_quadrant_2"],
+            q3=c["ratio_quadrant_3"],
+            q4=c["ratio_quadrant_4"],
+            q5=c["ratio_quadrant_5"],
         )
-        aggregate_texts.append(combined_ratios)
     elif focus == "Business Performance":
-        combined_ratios = (
-            f"- Phase 1 (A&E > 65): {ratio_high_high}\n"
-            f"- Phase 2 (A&E 35-65): {ratio_mid_mid}\n"
-            f"- Phase 3 (A&E < 35): {ratio_low_low}\n"
-        )
-        aggregate_texts.append(combined_ratios)
+        c = stats["combined"]
+        combined_block = (
+            "Phase 1 (A&E > 65): {hh}\n"
+            "Phase 2 (A&E 35-65): {mm}\n"
+            "Phase 3 (A&E < 35): {ll}"
+        ).format(hh=c["ratio_high_high"], mm=c["ratio_mid_mid"], ll=c["ratio_low_low"])
     elif focus == "Safeguarding Innovation":
-        combined_ratios = (
-            f"- Phase 1 (A < 35 & E > 65): {ratio_low_high}\n"
-            f"- Phase 2 (35-65): {ratio_mid_mid}\n"
-            f"- Phase 3 (A > 65 & E < 35): {ratio_high_low}\n"
-        )
-        aggregate_texts.append(combined_ratios)
-    else:
-        for dim in focus_to_dimensions[focus]:
-            agg = aggregate_measures[dim]
-            aggregate_texts.append(
-                f"{dim.replace('_', ' ').title()}\n"
-                f"Mean: {agg['mean']}, Std Dev: {agg['std_dev']}\n"
-                f"Below 25: {agg['ratio_below_25']}, 25-50: {agg['ratio_25_50']}, 50-75: {agg['ratio_50_75']}, >75: {agg['ratio_above_75']}"
-            )
-    return "\n".join(aggregate_texts)
+        c = stats["combined"]
+        combined_block = (
+            "Phase 1 (A < 35 & E > 65): {lh}\n"
+            "Phase 2 (35-65): {mm}\n"
+            "Phase 3 (A > 65 & E < 35): {hl}"
+        ).format(lh=c["ratio_low_high"], mm=c["ratio_mid_mid"], hl=c["ratio_high_low"])
+
+    return metrics_block, proportions_block, combined_block
 
 # -----------------------------
 # Streamlit UI
@@ -162,29 +193,42 @@ if uploaded_file:
                 "Strategic Hire Analysis", "Business Performance", "Safeguarding Innovation", "Summary"
             ]
 
+            # NEW: compute stats once
+            stats = compute_team_stats(test_team)
+
             for focus in focus_areas:
                 st.subheader(focus)
-                team_scores = generate_team_score_summary(focus, test_team)
+
+                # NEW: separate blocks for metrics, proportions, and combined ratios
+                metrics_text, proportions_text, combined_text = format_team_sections(focus, stats)
+
                 theory = extract_theory_block(focus, foundational_text)
                 example = extract_example_block(focus, description_text)
 
+                # NEW: clearly separated sections in the prompt
                 prompt = f"""
 You are an expert team analyst using the AEM-Cube framework.
 
 ### THEORY
-```text
+<text>
 {theory}
-```
+</text>
 
 ### EXAMPLE
-```text
+<text>
 {example}
-```
+</text>
 
-### TEAM SCORES
-{team_scores}
+### TEAM METRICS (Means & Standard Deviations)
+{metrics_text}
 
-Now generate a {focus} analysis. Be concise, logical, and aligned with the theory. Only highlight imbalances if the data shows it. Never contradict the above context.
+### TEAM DISTRIBUTION (Proportion of Members per Score Range)
+{proportions_text}
+
+{('### COMBINED RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
+
+Now generate a {focus} analysis. Be concise, logical, and aligned with the theory.
+Only highlight imbalances if the data shows it. Never contradict the above context.
 """
 
                 token_count = len(encoding.encode(prompt))
