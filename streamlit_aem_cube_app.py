@@ -230,7 +230,11 @@ You are an expert team analyst using the AEM-Cube framework.
 Now generate a {focus} analysis using the framework of the example in both length of the description and approach, but for the scores provided. Be concise, logical, and aligned with the theory.
 Only highlight imbalances if the data shows it. Never contradict the above context.
 
-For the analysis, use on the theory provided, do not intepret concept such as 'managing complexity' outside of this context. 
+### HARD CONSTRAINTS
+- Write **no more than {max_words} words**. This is a hard limit.
+- Match the **tone and structure** of the example (length, paragraphing, level of detail).
+- Be concise, logical, and aligned with the THEORY only. Do not introduce concepts outside the provided THEORY.
+- Output **only** the analysis text (no extra headings or labels).
 """
 
                 token_count = len(encoding.encode(prompt))
