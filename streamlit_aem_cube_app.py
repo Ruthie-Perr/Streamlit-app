@@ -225,7 +225,7 @@ You are an expert team analyst using the AEM-Cube framework.
 ### TEAM DISTRIBUTION (Proportion of Members per Score Range)
 {proportions_text}
 
-{('### COMBINED RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
+{('### RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
 
 Now generate a {focus} analysis using the framework of the example in both length of the description and approach, but for the scores provided. Be concise, logical, and aligned with the theory.
 Only highlight imbalances if the data shows it. Never contradict the above context.
