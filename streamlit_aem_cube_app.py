@@ -231,7 +231,7 @@ Now generate a {focus} analysis using the framework of the example in both lengt
 Only highlight imbalances if the data shows it. Never contradict the above context.
 
 ### HARD CONSTRAINTS
-- Write **no more than {max_words} words**. This is a hard limit.
+-Write **no more than 250 words**. This is a hard limit, **unless the focus is Summary**, for which the maximum is **500 words**.
 - Match the **tone and structure** of the example (length, paragraphing, level of detail).
 - Be concise, logical, and aligned with the THEORY only. Do not introduce concepts outside the provided THEORY.
 - Output **only** the analysis text (no extra headings or labels).
