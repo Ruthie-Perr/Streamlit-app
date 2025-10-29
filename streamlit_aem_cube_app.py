@@ -227,14 +227,21 @@ You are an expert team analyst using the AEM-Cube framework.
 
 {('### RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
 
-Now generate a {focus} analysis using the framework of the example in both length of the description and approach, but for the scores provided. Be concise, logical, and aligned with the theory.
-Only highlight imbalances if the data shows it. Never contradict the above context.
+### WRITING RULES
+- In the **opening 1–2 sentences**, **integrate** the actual mean and SD values **in natural prose** (no bullet list). Example style: 
+  "Attachment averages 58 (sd 12) while Exploration clusters around 46 (sd 9), suggesting…"
+  Do **not** paste a raw list of numbers; weave them into sentences.
+- Use **“bridge builders”** only when there is **clear polarity** (meaningful presence at both low and high ends) **and** a subset in the **central band (~37.5–62.5)** can act as **translators** between extremes. Do **not** label everyone mid-range as bridge builders.
+- Stay aligned with the THEORY. Do not introduce concepts outside it.
 
 ### HARD CONSTRAINTS
 -Write **no more than 250 words**. This is a hard limit, **unless the focus is Summary**, for which the maximum is **500 words**.
 - Match the **tone and structure** of the example (length, paragraphing, level of detail).
 - Be concise, logical, and aligned with the THEORY only. Do not introduce concepts outside the provided THEORY.
 - Output **only** the analysis text (no extra headings or labels).
+
+Now generate a {focus} analysis using the framework of the example in both length of the description and approach, but for the scores provided. Be concise, logical, and aligned with the theory.
+Only highlight imbalances if the data shows it. Never contradict the above context.
 """
 
                 token_count = len(encoding.encode(prompt))
