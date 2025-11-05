@@ -82,7 +82,7 @@ def compute_team_stats(test_team):
     for dim in dims:
         s = test_team[dim]
         metrics[dim] = {
-            "mean": float(np.round(s.mean(), 2)),
+            "mean": float(np.round(s.mean(), 0)),
             "std_dev": float(np.round(s.std(ddof=0), 2)),  # population SD for stability; change to ddof=1 if you prefer sample SD
         }
         proportions[dim] = {
