@@ -176,7 +176,7 @@ def format_team_sections(focus, stats):
 # -----------------------------
 # Streamlit UI
 # -----------------------------
-st.title("AEM-Cube Team Analysis")
+st.title("AI Golden Dialogues")
 uploaded_file = st.file_uploader("Upload AEM-Cube Team PDF", type="pdf")
 
 if uploaded_file:
