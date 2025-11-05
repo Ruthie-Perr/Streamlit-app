@@ -233,6 +233,7 @@ You are an expert team analyst using the AEM-Cube framework.
   Do **not** paste a raw list of numbers; weave them into sentences.
 - Incorporate the ratios but do not give the exact numbers, use natural prose, for example: when the ratio is 0.8, say a large proportion of the team...
 - Use **“bridge builders”** only when there is **clear polarity** (meaningful presence at both low and high ends) **and** a subset in the **central band (~37.5–62.5)** can act as **translators** between extremes. Do **not** label everyone mid-range as bridge builders.
+- For the Business Performance and Safeguarding Innovation dialogues, when mentioning the phases, also include which number it is. For example: This team exhibits a notable imbalance in their Business Performance Dialogue phases, with a significant absence in the first phase - Changing with People.
 - Stay aligned with the THEORY. Do not introduce concepts outside it.
 
 ### HARD CONSTRAINTS
