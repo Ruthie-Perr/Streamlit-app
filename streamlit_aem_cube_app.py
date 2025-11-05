@@ -225,7 +225,8 @@ You are an expert team analyst using the AEM-Cube framework.
 ### TEAM DISTRIBUTION (Proportion of Members per Score Range)
 {proportions_text}
 
-{('### RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
+{f"### RATIOS (A × E)\n{combined_text}" if combined_text else ""}
+
 
 ### WRITING RULES
 -  In the **opening 1–2 sentences** of the Product-Market-Fit, Speed-to-Market and Strategic-Agility Index, **integrate** the mean and SD values **in natural prose** (no bullet list). Example style: 
