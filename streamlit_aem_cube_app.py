@@ -253,12 +253,12 @@ Only highlight imbalances if the data shows it. Never contradict the above conte
                     st.code(prompt)
 
                 response = client.chat.completions.create(
-                    model="gpt-5",
+                    model="gpt-4",
                     messages=[
                         {"role": "system", "content": "You are a structured and insightful team analyst."},
                         {"role": "user", "content": prompt}
                     ],
-                    #temperature=0.3
+                    temperature=0.3
                 )
 
                 st.markdown(response.choices[0].message.content)
