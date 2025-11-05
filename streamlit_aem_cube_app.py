@@ -228,7 +228,7 @@ You are an expert team analyst using the AEM-Cube framework.
 {('### RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
 
 ### WRITING RULES
--  In the **opening 1–2 sentences**, **integrate** the mean and SD values **in natural prose** (no bullet list). Example style: 
+-  In the **opening 1–2 sentences** of the Product-Market-Fit, Speed-to-Market and Strategic-Agility Index, **integrate** the mean and SD values **in natural prose** (no bullet list). Example style: 
   "Attachment has a high mean with a high spread…"
   Do **not** paste a raw list of numbers; weave them into sentences.
 - Incorporate the ratios but do not give the exact numbers, use natural prose, for example: when the ratio is 0.8, say a large proportion of the team...
