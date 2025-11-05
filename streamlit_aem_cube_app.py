@@ -228,9 +228,10 @@ You are an expert team analyst using the AEM-Cube framework.
 {('### RATIOS (A × E)\\n' + combined_text) if combined_text else ''}
 
 ### WRITING RULES
-- In the **opening 1–2 sentences**, **integrate** the actual mean and SD values **in natural prose** (no bullet list). Example style: 
-  "Attachment averages 58 (sd 12) while Exploration clusters around 46 (sd 9), suggesting…"
+-  In the **opening 1–2 sentences**, **integrate** the mean and SD values **in natural prose** (no bullet list). Example style: 
+  "Attachment has a high mean with a high spread…"
   Do **not** paste a raw list of numbers; weave them into sentences.
+- Incorporate the ratios but do not give the exact numbers, use natural prose, for example: when the ratio is 0.8, say a large proportion of the team...
 - Use **“bridge builders”** only when there is **clear polarity** (meaningful presence at both low and high ends) **and** a subset in the **central band (~37.5–62.5)** can act as **translators** between extremes. Do **not** label everyone mid-range as bridge builders.
 - Stay aligned with the THEORY. Do not introduce concepts outside it.
 
