@@ -28,12 +28,12 @@ focus_to_dimensions = {
 
 focus_prompts = {
     "Summary": "Provide a comprehensive analysis of the team’s distribution across the three AEM-Cube dimensions: Attachment (content vs. relationship focus), Exploration (optimising vs. explorative), and Managing Complexity (specialist vs. generalist). Explain how this distribution shapes the team’s collaboration, working style, and decision-making. Identify key strengths, imbalances, or underrepresented areas, and discuss how these may impact the team’s ability to innovate, deliver, and adapt. Suggest how the team can improve its strategic agility by reinforcing overlooked perspectives, adjusting roles, or developing bridging contributions to support long-term performance and alignment.",
-    "Product-Market-Fit": "Provide an analysis of how the Attachment score influences the team's alignment between product and customer needs...",
-    "Speed-to-Market": "Analyze how the Exploration score influences the team's ability to balance innovation with the practical demands of delivering solutions in a timely manner...",
-    "Strategic Agility Index": "Provide an analysis that describes how the Managing Complexity score influences the team's ability to manage complex problems...",
-    "Strategic Hire Analysis": "Provide an analysis that reflects on the distribution of the individuals into the result areas from the Strategic Hire Analysis...",
-    "Business Performance": "Provide an analysis that analyzes the distribution of teammembers across the three phases of the Business Performance Dialogue...",
-    "Safeguarding Innovation": "Provide an analysis that identifies how the teammembers are distributed across the three phases of the Safeguarding Innovation dialogue..."
+    "Product-Market-Fit": "Provide an analysis of how the Attachment score influences the team's alignment between product and customer needs.",
+    "Speed-to-Market": "Analyze how the Exploration score influences the team's ability to balance innovation with the practical demands of delivering solutions in a timely manner.",
+    "Strategic Agility Index": "Provide an analysis that describes how the Managing Complexity score influences the team's ability to manage complex problems.",
+    "Strategic Hire Analysis": "Provide an analysis that reflects on the distribution of the individuals into the result areas from the Strategic Hire Analysis.",
+    "Business Performance": "Provide an analysis that analyzes the distribution of teammembers across the three phases of the Business Performance Dialogue.",
+    "Safeguarding Innovation": "Provide an analysis that identifies how the teammembers are distributed across the three phases of the Safeguarding Innovation dialogue."
 }
 
 # ────────────────────────────────────────────
@@ -174,6 +174,7 @@ if uploaded_file is not None:
         st.error(f"Error: {e}")
 else:
     st.warning("Please upload a PDF file.")
+
 
 
 
