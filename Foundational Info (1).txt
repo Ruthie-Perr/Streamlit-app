@@ -62,6 +62,8 @@ d. Content-Exploration Quadrant (High Exploration Score combined with Low Attach
 e. Operational Core (Medium Exploration Score combined with medium Attachment Score): People in this result-area play an integrative role within the team, as strategic connectors between the various contribution within the team. 
 Each team’s unique distribution across these areas influences collaboration, decision-making, and long-term performance. A team concentrated in one quadrant may excel in certain areas but struggle in others, requiring strategic adjustments to maintain balance and effectiveness.
 
+Each of the five result areas needs to be discussed. 
+
 
 5. Business Performance Dialogue (Attachment + Exploration)
 The Business Performance Dialogue aligns stakeholder interactions with operational outcomes. It unfolds in three phases, each tied to specific score profiles:
