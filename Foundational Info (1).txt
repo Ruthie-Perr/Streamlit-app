@@ -1,5 +1,4 @@
-AEM-Cube: Insights for Adaptive Performance
-The AEM-Cube® explores cognitive diversity across three key dimensions: Attachment, Exploration, and Managing Complexity, revealing how individuals prefer to contribute to change, innovation, and performance within their team. It is about a person's natural tendencies, preferences, motivations, and sources of energy. This understanding aids in aligning roles and strategies with organizational needs.
+Theory AEM-Cube: The AEM-Cube explores cognitive diversity across three key dimensions: Attachment, Exploration, and Managing Complexity, revealing how individuals prefer to contribute to change, innovation, and performance within their team. It is about a person's natural tendencies, preferences, motivations, and sources of energy. This understanding aids in aligning roles and strategies with organizational needs.
 When describing team tendencies, focus on preferences, motivations, and sources of energy rather than behaviors or activities. 
 
 
