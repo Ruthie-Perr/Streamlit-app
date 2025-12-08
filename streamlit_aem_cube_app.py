@@ -272,7 +272,7 @@ Proportion of Members per Score Range: {proportions_text}
 - Stick strictly to the THEORY; do not introduce concepts or terminology outside it.
 - Output only the analysis text — no extra headings, labels, or annotations.
 - Use the content provided in all tags (e.g., <Dialogue_theory>, <Example>, <Team_metrics>) for reference only; do not mention or reference the tag names themselves in the output.
-
+- When describing team tendencies along a dimension (Attachment, Exploration, Managing Complexity), always reference the pole or preference (e.g., Specialist vs. Generalist), not the dimension name itself. Avoid phrasing that treats the dimension as a single preference.
 </Constraints>
 
 
@@ -282,6 +282,8 @@ Interpret the data provided in <Team_metrics> according to the <AEM-Cube_framewo
 1. Base you analysis on the provided <Team_metrics>.
 2. Apply the THEORY consistently; do not introduce concepts or terminology outside it.
 3. Integrate all relevant metrics, proportions, and ranges to produce a coherent team analysis.
+4. Describe team tendencies in terms of poles or preferences, not dimension names alone. For example, say "leans toward Generalist thinking" rather than "emphasis on Managing Complexity."
+
 </Reasoning>
 
 <Instructions>
