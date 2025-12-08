@@ -274,6 +274,8 @@ Proportion of Members per Score Range: {proportions_text}
 - Use the content provided in all tags (e.g., <Dialogue_theory>, <Example>, <Team_metrics>) for reference only; do not mention or reference the tag names themselves in the output.
 - When describing team tendencies along a dimension (Attachment, Exploration, Managing Complexity), always reference the pole or preference (e.g., Specialist vs. Generalist), not the dimension name itself. Avoid phrasing that treats the dimension as a single preference.
 - When producing a team summary, focus on overall patterns, balance, and interplay between tendencies rather than describing each dimension in isolation.
+- Generate the analysis strictly based on the data in <Team_metrics> and the context in <Dialogue_theory>. Do not reference other dialogues, phases, or external contexts that are not included in the provided metrics.
+
 
 </Constraints>
 
