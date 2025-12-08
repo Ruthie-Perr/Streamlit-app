@@ -207,7 +207,7 @@ if uploaded_file:
 
                 # NEW: clearly separated sections in the prompt
                 prompt = f"""
-You are an expert team analyst using the AEM-Cube framework.
+<system>Act like an expert team analyst using the </AEM-Cube_framework> and the  <AEM-Cube_dimensions></system>
 
 ### THEORY
 <text>
@@ -215,9 +215,9 @@ You are an expert team analyst using the AEM-Cube framework.
 </text>
 
 ### EXAMPLE
-<text>
+<example>
 {example}
-</text>
+</example>
 
 ### TEAM METRICS (Means & Standard Deviations)
 {metrics_text}
