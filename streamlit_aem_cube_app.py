@@ -215,43 +215,81 @@ if uploaded_file:
 <system>Act like an expert team analyst using the </AEM-Cube_framework> and the  <AEM-Cube_dimensions></system>
 
 ### THEORY
-<text>
+<AEM-Cube_framework>
+The AEM-Cube explores cognitive diversity across three key dimensions: Attachment, Exploration, and Managing Complexity, revealing how individuals prefer to contribute to change, 
+innovation, and performance within their team. It is about a person's natural tendencies, preferences, motivations, and sources of energy. This understanding aids in aligning roles and strategies with organizational needs. 
+</AEM-Cube_framework>
+
+<AEM-Cube_dimensions>Attachment Axis (1-100): Content vs. Relationship Focus.
+- Low scores: Content-focus — expertise, processes, tangible knowledge.
+- High scores: Relationship-focus — trust, people, collaboration.
+Exploration Axis (1-100): Optimizing vs. Explorative.
+- Low scores: Optimizing — proven strategies and refinement.
+- High scores: Explorative — novelty, experimentation, innovation.
+Managing Complexity Axis (1-100): Specialist vs. Generalist.
+- Low scores: Specialist — relying on deep expertise.
+- High scores: Generalist — integrating broad systems perspectives.
+Quadrant interpretation (applies to all axes):
+- 0–25: Strong orientation toward the lower-end pole
+- 25–50: Moderate orientation toward the lower-end pole
+- 50–75: Moderate orientation toward the higher-end pole
+- 75–100: Strong orientation toward the higher-end pole</AEM-Cube_dimensions>
+
+<Bridge-builders>In teams with a strongly polarised profile—where members cluster at opposite ends of a dimension—those positioned in the mid-range become essential Bridge Builders. 
+They can translate between the contrasting perspectives, priorities, and working styles found at each extreme. When these mid-range contributors are recognized and intentionally 
+leveraged, they help the team integrate divergent viewpoints into coherent action, ensuring that the strengths at both poles are harnessed without the group becoming fragmented 
+or stuck in opposition. The concept of “bridge builders” only applies when there is clear polarity (meaningful presence at both low and high ends) and a subset in the central 
+band (~37.5–62.5) can act as translators between extremes. Do not label everyone mid-range as bridge builders.</Bridge-builders>
+
+<Dialogue_theory>
 {theory}
-</text>
+</Dialogue_theory>
 
-### EXAMPLE
-<example>
+<Example>
 {example}
-</example>
-
-### TEAM METRICS (Means & Standard Deviations)
-{metrics_text}
-
-### TEAM DISTRIBUTION (Proportion of Members per Score Range)
-{proportions_text}
-
-{f"### RATIOS (A × E)\n{combined_text}" if combined_text else ""}
+</Example>
 
 
-### WRITING RULES
--  In the **opening 1–2 sentences** of the Product-Market-Fit, Speed-to-Market and Strategic-Agility Index, **integrate** the mean and SD values **in natural prose** (no bullet list). Example style: 
-  "Attachment has a high mean with a high spread…"
-  Do **not** put the raw number of the standard deviation in the description. 
-- Incorporate the ratios but do not give the exact numbers, use natural prose, for example: when the ratio is 0.8, say a large proportion of the team...
-- Use **“bridge builders”** only when there is **clear polarity** (meaningful presence at both low and high ends) **and** a subset in the **central band (~37.5–62.5)** can act as **translators** between extremes. Do **not** label everyone mid-range as bridge builders.
-- For the Business Performance and Safeguarding Innovation Dialgues, when referring to the phases always include the phase number and name (e.g., “Phase 1 – Changing with People”).
-- Avoid circular or redundant phrasing that merely restates information (e.g., repeating what was just said in different words). When using connective phrases like “this shows,” “this is evident,” or “this suggests,” ensure they introduce a new insight, implication, or interpretation — not a restatement of the data itself.
-- When describing team tendencies, focus on preferences, motivations, and sources of energy rather than behaviors or activities. Avoid rigid terms like “entrenched,” “stuck,” or “focused on doing,” and use phrases like “draws energy from,” “shows a preference for,” or “is motivated by.”
-- Stay aligned with the THEORY. Do not introduce concepts outside it.
+<Team_metrics>
+Mean and standard deviation:{metrics_text}
 
-### HARD CONSTRAINTS
--Write **no more than 250 words**. This is a hard limit, **unless the focus is Summary**, for which the maximum is **500 words**.
-- Match the **tone and structure** of the example (length, paragraphing, level of detail).
-- Be concise, logical, and aligned with the THEORY only. Do not introduce concepts outside the provided THEORY.
-- Output **only** the analysis text (no extra headings or labels).
+Proportion of Members per Score Range: {proportions_text}
 
-Now generate a {focus} analysis using the framework of the example in both length of the description and approach, but for the scores provided. Be concise, logical, and aligned with the theory.
-Only highlight imbalances if the data shows it. Never contradict the above context.
+{f"### RATIOS\n{combined_text}" if combined_text else ""}
+</Team_metrics>
+
+
+<Constraints>
+- Limit output to 250 words (500 words only for Summary). Be concise, coherent, and logical.
+- Avoid circular or redundant phrasing; each sentence should provide a new insight, implication, or interpretation.
+- Follow the style, tone, paragraphing, and length of the provided <Example>.
+- Use bridge builders only when:
+  1. There is clear polarity (members at both low and high ends), and
+  2. A central-band subset (~37.5–62.5) can act as translators between extremes.
+- Integrate mean and standard deviation in natural prose; do not include raw SD numbers.
+- Describe proportions of members in natural language (e.g., "a large proportion of the team…") without exact percentages.
+- When discussing Business Performance or Safeguarding Innovation phases, always include the phase number and name (e.g., “Phase 1 – Changing with People”).
+- Focus on team preferences, motivations, and sources of energy; avoid behaviors or activities.
+- Stick strictly to the THEORY; do not introduce concepts or terminology outside it.
+- Output only the analysis text — no extra headings, labels, or annotations.
+</Constraints>
+
+
+<Reasoning>
+Interpret the data provided in <Team_metrics> according to the <AEM-Cube_framework> and <AEM-Cube_dimensions>. Apply the following:
+
+1. Base you analysis on the provided <Team_metrics>.
+2. Apply the THEORY consistently; do not introduce concepts or terminology outside it.
+3. Integrate all relevant metrics, proportions, and ranges to produce a coherent team analysis.
+</Reasoning>
+
+<Instructions>
+Generate a team analysis based on the scores provided in <Team_metrics>, using the <AEM-Cube_framework> and dimensions <AEM-Cube_dimensions>. 
+Follow the style, length, and approach demonstrated in <Example>. 
+Be concise, logical, and aligned with the THEORY. 
+Only highlight imbalances or notable patterns if the data supports them. 
+Do not introduce concepts or interpretations outside the provided context.
+</Instructions>
 """
 
                 token_count = len(encoding.encode(prompt))
