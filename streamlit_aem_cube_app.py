@@ -22,7 +22,7 @@ with open("Foundational Info (1).txt", "r", encoding="utf-8") as f:
 with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
     description_text = f.read()
 
-def extract_foundational(text):
+def extract_foundation(text):
     section = text.split("Theory AEM-Cube")[1]
     return section
 
