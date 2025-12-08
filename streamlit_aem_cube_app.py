@@ -22,6 +22,10 @@ with open("Foundational Info (1).txt", "r", encoding="utf-8") as f:
 with open("Descriptions (3).txt", "r", encoding="utf-8") as f:
     description_text = f.read()
 
+def extract_foundational(text):
+    section = text.split("Theory AEM-Cube")[1]
+    return section
+
 def extract_theory_block(name, text):
     focus_areas = {
         "Product-Market-Fit": ("1. Product-Market-Fit", "2. Speed-to-Market"),
@@ -202,6 +206,7 @@ if uploaded_file:
                 # NEW: separate blocks for metrics, proportions, and combined ratios
                 metrics_text, proportions_text, combined_text = format_team_sections(focus, stats)
 
+                foundation = extract_foundation(foundational_text)
                 theory = extract_theory_block(focus, foundational_text)
                 example = extract_example_block(focus, description_text)
 
