@@ -263,9 +263,8 @@ Proportion of Members per Score Range: {proportions_text}
 - Limit output to 250 words (500 words only for Summary). Be concise, coherent, and logical.
 - Avoid circular or redundant phrasing; each sentence should provide a new insight, implication, or interpretation.
 - Follow the style, tone, paragraphing, and length of the provided <Example>.
-- Use bridge builders only when:
-  1. There is clear polarity (members at both low and high ends), and
-  2. A central-band subset (~37.5–62.5) can act as translators between extremes.
+- Consider bridge builders conceptually when interpreting the distribution of scores (central-band members may facilitate translation between extremes), 
+  but do not explicitly reference bridge builders in the analysis unless there is strong polarity that warrants it.
 - Integrate mean and standard deviation in natural prose; do not include raw SD numbers.
 - Describe proportions of members in natural language (e.g., "a large proportion of the team…") without exact percentages.
 - When discussing Business Performance or Safeguarding Innovation phases, always include the phase number and name (e.g., “Phase 1 – Changing with People”).
