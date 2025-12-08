@@ -273,16 +273,21 @@ Proportion of Members per Score Range: {proportions_text}
 - Output only the analysis text — no extra headings, labels, or annotations.
 - Use the content provided in all tags (e.g., <Dialogue_theory>, <Example>, <Team_metrics>) for reference only; do not mention or reference the tag names themselves in the output.
 - When describing team tendencies along a dimension (Attachment, Exploration, Managing Complexity), always reference the pole or preference (e.g., Specialist vs. Generalist), not the dimension name itself. Avoid phrasing that treats the dimension as a single preference.
+- When producing a team summary, focus on overall patterns, balance, and interplay between tendencies rather than describing each dimension in isolation.
+
 </Constraints>
 
 
 <Reasoning>
 Interpret the data provided in <Team_metrics> according to the <AEM-Cube_framework> and <AEM-Cube_dimensions>. Apply the following:
 
-1. Base you analysis on the provided <Team_metrics>.
-2. Apply the THEORY consistently; do not introduce concepts or terminology outside it.
-3. Integrate all relevant metrics, proportions, and ranges to produce a coherent team analysis.
-4. Describe team tendencies in terms of poles or preferences, not dimension names alone. For example, say "leans toward Generalist thinking" rather than "emphasis on Managing Complexity."
+- Base you analysis on the provided <Team_metrics>.
+- Apply the THEORY consistently; do not introduce concepts or terminology outside it.
+- Integrate all relevant metrics, proportions, and ranges to produce a coherent team analysis.
+- Describe team tendencies in terms of poles or preferences, not dimension names alone. For example, say "leans toward Generalist thinking" rather than "emphasis on Managing Complexity."
+- Generate a holistic summary of the team’s cognitive profile, synthesizing tendencies across all relevant axes.
+- Open the summary with an integrated statement about the team’s overall cognitive balance or profile, before elaborating on any notable trends.
+
 
 </Reasoning>
 
