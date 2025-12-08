@@ -271,6 +271,8 @@ Proportion of Members per Score Range: {proportions_text}
 - Focus on team preferences, motivations, and sources of energy; avoid behaviors or activities.
 - Stick strictly to the THEORY; do not introduce concepts or terminology outside it.
 - Output only the analysis text — no extra headings, labels, or annotations.
+- Use the content provided in all tags (e.g., <Dialogue_theory>, <Example>, <Team_metrics>) for reference only; do not mention or reference the tag names themselves in the output.
+
 </Constraints>
 
 
